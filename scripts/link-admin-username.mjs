@@ -87,6 +87,9 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error('Failed:', err.message || err);
+  const msg = err.code === 'auth/configuration-not-found'
+    ? 'Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.'
+    : (err.message || String(err));
+  console.error('Failed:', msg);
   process.exit(1);
 });

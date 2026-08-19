@@ -18,6 +18,7 @@ loginForm?.addEventListener('submit', async (e) => {
     await auth.signInWithEmailAndPassword(email, password);
     window.location.href = 'admin/dashboard.html';
   } catch (err) {
+    console.error('Login error:', err);
     setAuthStatus(authStatus, friendlyAuthError(err), true);
     loginBtn.disabled = false;
     loginBtn.textContent = 'Log in';

@@ -42,6 +42,7 @@ registerForm?.addEventListener('submit', async (e) => {
 
     window.location.href = 'admin/dashboard.html';
   } catch (err) {
+    console.error('Register error:', err);
     if (cred?.user) {
       try { await cred.user.delete(); } catch (_) { /* ignore cleanup failure */ }
     }
