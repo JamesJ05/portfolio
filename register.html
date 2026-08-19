@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign up — James Stephen Jason</title>
+<meta name="description" content="Create an account to manage your portfolio projects and skills." />
+<link rel="icon" type="image/png" href="assets/images/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/animations.css" />
+<link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+<canvas id="net-bg"></canvas>
+
+<main class="auth-page">
+  <div class="auth-shell reveal in-view">
+    <aside class="auth-brand">
+      <a href="index.html" class="logo">
+        <img src="assets/images/logo.png" alt="" class="logo-mark" />
+        <span>James Stephen<span class="dot">.</span></span>
+      </a>
+      <div>
+        <h2>Build your portfolio.</h2>
+        <p>Create your account once to upload projects, sync skills to the database, and keep everything up to date.</p>
+      </div>
+      <ul class="auth-features">
+        <li>Secure email &amp; password authentication</li>
+        <li>Firestore-backed project gallery</li>
+        <li>Skills section synced from the cloud</li>
+      </ul>
+    </aside>
+
+    <section class="auth-panel">
+      <a href="index.html" class="auth-back">← back to site</a>
+      <h1>Create account</h1>
+      <p class="sub">Set up your admin account — only you should register here.</p>
+
+      <form id="registerForm" class="auth-form">
+        <label>
+          Username
+          <input type="text" name="username" required autocomplete="username" placeholder="JamesJason" pattern="[a-zA-Z0-9_]{3,20}" minlength="3" maxlength="20" />
+          <span class="password-hint">3–20 characters · letters, numbers, underscores</span>
+        </label>
+        <label>
+          Full name
+          <input type="text" name="displayName" required autocomplete="name" placeholder="James Stephen Jason" />
+        </label>
+        <label>
+          Email address
+          <input type="email" name="email" required autocomplete="email" placeholder="you@email.com" />
+        </label>
+        <label>
+          Password
+          <input type="password" name="password" required minlength="6" autocomplete="new-password" placeholder="••••••••" />
+          <span class="password-hint">Minimum 6 characters</span>
+        </label>
+        <label>
+          Confirm password
+          <input type="password" name="confirmPassword" required minlength="6" autocomplete="new-password" placeholder="••••••••" />
+        </label>
+        <button type="submit" class="btn btn-primary" id="registerBtn">Create account</button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a href="login.html">Log in</a></p>
+      <p class="form-status" id="authStatus"></p>
+    </section>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/auth-utils.js"></script>
+<script src="js/register.js"></script>
+</body>
+</html>

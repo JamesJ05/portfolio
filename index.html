@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>James Stephen Jason — Java Developer</title>
+<meta name="description" content="James Stephen M. Jason (JHAZZ) — Entry-level Java Developer portfolio. Spring Boot, React, Firebase." />
+<link rel="icon" type="image/png" href="assets/images/logo.png" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+<!-- Ambient animated network background -->
+<canvas id="net-bg"></canvas>
+<div class="grain"></div>
+
+<!-- ===== NAV ===== -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo">
+      <img src="assets/images/logo.png" alt="" class="logo-mark" />
+      <span>James Stephen<span class="dot">.</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#about">about</a>
+      <a href="#experience">experience</a>
+      <a href="#skills">skills</a>
+      <a href="#projects">projects</a>
+      <a href="#contact">contact</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="assets/resume.pdf" target="_blank" class="nav-admin">↓ résumé</a>
+      <div class="auth-nav" id="authNav">
+        <a href="login.html" class="btn btn-ghost nav-btn">Log in</a>
+        <a href="register.html" class="btn btn-primary nav-btn">Sign up</a>
+      </div>
+    </div>
+    <button class="nav-burger" id="navBurger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <p class="eyebrow reveal">// hello, world</p>
+      <h1 class="hero-title reveal">
+        <span class="line">I build systems</span>
+        <span class="line">that <span class="accent">hold up</span> under load.</span>
+      </h1>
+      <p class="hero-lede reveal">
+        Computer Engineering graduate specializing in Java &amp; Spring Boot — backend
+        systems, role-based access control, and APIs built to survive production.
+      </p>
+      <div class="hero-cta reveal">
+        <a href="#projects" class="btn btn-primary">View projects</a>
+        <a href="#contact" class="btn btn-ghost">Get in touch</a>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal">
+      <div class="terminal">
+        <div class="terminal-bar"><span></span><span></span><span></span><p>developer.java</p></div>
+        <pre class="terminal-body"><code><span class="tk-kw">public class</span> <span class="tk-cl">Developer</span> {
+    <span class="tk-kw">private</span> String name = <span class="tk-str">"James Stephen Jason"</span>;
+    <span class="tk-kw">private</span> String alias = <span class="tk-str">"JHAZZ"</span>;
+    <span class="tk-kw">private</span> String role = <span class="tk-str">"Java Developer"</span>;
+    <span class="tk-kw">private</span> String[] stack = {<span class="tk-str">"Java"</span>, <span class="tk-str">"Spring Boot"</span>, <span class="tk-str">"React"</span>, <span class="tk-str">"Firebase"</span>};
+    <span class="tk-kw">private</span> <span class="tk-kw">boolean</span> openToWork = <span class="tk-kw">true</span><span class="cursor">|</span>
+}</code></pre>
+      </div>
+
+      <div class="id-card">
+        <div class="id-photo">
+          <img src="assets/images/profile.jpg" alt="James Stephen Jason" />
+        </div>
+        <div class="id-meta">
+          <p class="id-name">James Stephen Jason</p>
+          <p class="id-role">Java Developer</p>
+          <p class="id-status"><span class="status-dot"></span>Open to work</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#about" class="scroll-cue" aria-label="Scroll down"><span></span></a>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section class="section" id="about">
+  <div class="section-inner about-grid">
+    <div class="about-photo reveal">
+      <div class="photo-frame">
+        <img src="assets/images/profile.jpg" alt="Portrait of James Stephen Jason" id="profileImg">
+      </div>
+      <p class="photo-caption">Bulacan, Philippines</p>
+    </div>
+    <div class="about-copy reveal">
+      <p class="eyebrow">about</p>
+      <h2>Computer Engineering grad, chasing enterprise Java.</h2>
+      <p>
+        I'm James Stephen M. Jason — known online as JHAZZ — a Computer Engineering
+        graduate from Bulacan State University (BulSU), graduated June 2026. I build
+        full-stack applications with Java, Python, Flask, MySQL, Firebase, and
+        JavaScript, and I'm looking for an entry-level role where I can grow inside a
+        real engineering team.
+      </p>
+      <p>
+        My OJT at Nexus IT Solution in Pasig put me close to real infrastructure —
+        network configuration, server maintenance, and hardware/software
+        troubleshooting — rather than isolated classroom exercises. Since then I've
+        focused on backend systems: layered Spring Boot services, role-based access
+        control, and REST APIs designed to be boring to operate because they were
+        built carefully the first time.
+      </p>
+      <div class="about-stats">
+        <div><strong>3</strong><span>major systems shipped</span></div>
+        <div><strong>Java</strong><span>primary language</span></div>
+        <div><strong>4</strong><span>certifications earned</span></div>
+      </div>
+      <a href="assets/resume.pdf" target="_blank" class="btn btn-ghost resume-btn">Download résumé ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EXPERIENCE ===== -->
+<section class="section section-alt" id="experience">
+  <div class="section-inner">
+    <p class="eyebrow reveal">experience</p>
+    <h2 class="reveal">Where I've worked.</h2>
+    <div class="timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content">
+          <div class="timeline-head">
+            <h3>On-the-Job Training — Nexus IT Solution</h3>
+            <span class="timeline-date">Jun 2025 – Jul 2025</span>
+          </div>
+          <p class="timeline-loc">Pasig, Metro Manila</p>
+          <ul>
+            <li>Completed hands-on training in Cisco networking fundamentals, including configuration and troubleshooting.</li>
+            <li>Assisted in configuring and maintaining network devices, servers, and IT infrastructure under senior engineers.</li>
+            <li>Diagnosed and resolved hardware, software, and connectivity issues, improving overall system reliability.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-marker"></div>
+        <div class="timeline-content">
+          <div class="timeline-head">
+            <h3>BS Computer Engineering — Bulacan State University</h3>
+            <span class="timeline-date">Graduated Jun 2026</span>
+          </div>
+          <p class="timeline-loc">BulSU, Bulacan</p>
+          <ul>
+            <li>Thesis: Aegis of Cyberprotection — a Raspberry Pi hardware-software system for real-time USB threat, rogue AP, and network anomaly detection.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SKILLS ===== -->
+<section class="section" id="skills">
+  <div class="section-inner">
+    <p class="eyebrow reveal">skills</p>
+    <h2 class="reveal">The stack I ship with.</h2>
+    <p class="section-sub reveal">Synced live from the database — update them anytime from your dashboard.</p>
+    <div id="skillsGrid" class="skills-grid reveal">
+      <div class="skills-loading">Loading skills…</div>
+    </div>
+
+    <div class="cert-strip reveal">
+      <span class="cert-label">Certifications</span>
+      <div class="cert-tags" id="certTags">
+        <span class="skills-loading">Loading…</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROJECTS ===== -->
+<section class="section section-alt" id="projects">
+  <div class="section-inner">
+    <p class="eyebrow reveal">projects</p>
+    <h2 class="reveal">Things I've built.</h2>
+    <p class="section-sub reveal">Pulled live from my project database — new builds show up here the moment I upload them.</p>
+
+    <div id="projectsGrid" class="projects-grid reveal">
+      <!-- Firestore-loaded cards are injected here by js/projects.js -->
+      <div class="projects-loading" id="projectsLoading">Loading projects…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROJECT DETAIL MODAL ===== -->
+<div class="modal-backdrop" id="projectModalBackdrop">
+  <div class="modal-card" id="projectModalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div class="modal-thumb" id="modalThumb"></div>
+    <div class="modal-body">
+      <h3 id="modalTitle"></h3>
+      <p id="modalDescription"></p>
+      <div class="project-tags" id="modalTags"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONTACT ===== -->
+<section class="section" id="contact">
+  <div class="section-inner contact-grid">
+    <div class="reveal">
+      <p class="eyebrow">contact</p>
+      <h2>Let's talk about a role.</h2>
+      <p>
+        Open to entry-level Java Developer, Associate Software Engineer, and Application
+        Developer roles. Send a message and it lands straight in my inbox.
+      </p>
+      <ul class="contact-list">
+        <li><span>Email</span> jamesstephen.m.jason@gmail.com</li>
+        <li><span>Phone</span> +63 949-142-1967</li>
+        <li><span>LinkedIn</span> linkedin.com/in/jamesjason5</li>
+        <li><span>Status</span> <em class="status-dot"></em> Open to work</li>
+      </ul>
+    </div>
+    <form id="contactForm" class="contact-form reveal">
+      <label>
+        Name
+        <input type="text" name="from_name" required placeholder="Juan Dela Cruz" />
+      </label>
+      <label>
+        Email
+        <input type="email" name="reply_to" required placeholder="you@email.com" />
+      </label>
+      <label>
+        Message
+        <textarea name="message" rows="5" required placeholder="Let's talk about..."></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary" id="contactSubmit">Send message</button>
+      <p class="form-status" id="formStatus"></p>
+    </form>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <a href="#top" class="logo">
+      <img src="assets/images/logo.png" alt="" class="logo-mark" />
+      <span>James Stephen<span class="dot">.</span></span>
+    </a>
+    <div class="footer-links">
+      <a href="mailto:jamesstephen.m.jason@gmail.com">Email</a>
+      <a href="https://linkedin.com/in/jamesjason5" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="login.html">Log in</a>
+      <a href="register.html">Sign up</a>
+    </div>
+  </div>
+  <p class="footer-meta">© <span id="year"></span> James Stephen M. Jason · built with Java on the mind.</p>
+</footer>
+
+<!-- Firebase (compat SDK — simplest for a static site) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- EmailJS for auto-forwarding contact form to your inbox -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/nav-auth.js"></script>
+<script src="js/skills.js"></script>
+<script src="js/projects.js"></script>
+<script src="js/contact.js"></script>
+</body>
+</html>
