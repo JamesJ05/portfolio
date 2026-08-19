@@ -10,6 +10,10 @@
  * 5. See ../README.md for the Firestore security rules to paste in.
  * -----------------------------------------------------------
  */
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+
 const firebaseConfig = {
   apiKey: "AIzaSyBnTpyW6yURDr3te8Sc7aJvWJaBt9azlhU",
   authDomain: "portpolio-8db8d.firebaseapp.com",
