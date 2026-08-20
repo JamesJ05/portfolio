@@ -31,7 +31,8 @@ service cloud.firestore {
       && request.resource.data.displayName.size() <= 80
       && (!('photoURL' in request.resource.data)
         || (request.resource.data.photoURL is string
-          && request.resource.data.photoURL.size() <= 2048));
+          && request.resource.data.photoURL.size() <= 100000
+          && request.resource.data.photoURL.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')));
   }
 
   match /databases/{database}/documents {
