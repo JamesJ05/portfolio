@@ -47,8 +47,8 @@
       setBrandLabel(navUsername, 'Aspiring IT Professional');
       setBrandLabel(footerUsername, 'Guest');
       authNav.innerHTML = `
-        <a href="login.html" class="btn btn-ghost nav-btn">Log in</a>
-        <a href="register.html" class="btn btn-primary nav-btn">Sign up</a>
+        <a href="https://jamesj05.github.io/portfolio/login.html" class="btn btn-ghost nav-btn">Log in</a>
+        <a href="https://jamesj05.github.io/portfolio/register.html" class="btn btn-primary nav-btn">Sign up</a>
       `;
     }
   });
