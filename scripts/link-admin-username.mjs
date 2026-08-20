@@ -14,6 +14,7 @@ import {
   getFirestore,
   doc,
   setDoc,
+  getDoc,
   serverTimestamp
 } from 'firebase/firestore';
 
@@ -63,17 +64,29 @@ async function main() {
     }
   }
 
-  await setDoc(usernameRef, {
-    uid: user.uid,
-    username: ADMIN_USERNAME
-  });
+  const existingUsername = await getDoc(usernameRef);
+  if (existingUsername.exists()) {
+    if (existingUsername.data().uid !== user.uid) {
+      throw new Error(`Username "${ADMIN_USERNAME}" is already linked to another account.`);
+    }
+    console.log('Username is already linked to this account.');
+  } else {
+    await setDoc(usernameRef, {
+      uid: user.uid,
+      username: ADMIN_USERNAME
+    });
+  }
 
-  await setDoc(doc(db, 'users', user.uid), {
-    username: ADMIN_USERNAME,
-    email: ADMIN_EMAIL,
-    displayName: ADMIN_USERNAME,
-    createdAt: serverTimestamp()
-  }, { merge: true });
+  const userRef = doc(db, 'users', user.uid);
+  const existingProfile = await getDoc(userRef);
+  if (!existingProfile.exists()) {
+    await setDoc(userRef, {
+      username: ADMIN_USERNAME,
+      email: ADMIN_EMAIL,
+      displayName: ADMIN_USERNAME,
+      createdAt: serverTimestamp()
+    });
+  }
 
   console.log('Done.');
   console.log(`  Username: ${ADMIN_USERNAME}`);
