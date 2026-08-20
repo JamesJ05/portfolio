@@ -47,6 +47,9 @@ build/Release
 # Dependency directories
 node_modules/
 
+# Local duplicate repository; never deploy or track it from this project.
+/portfolio/
+
 # Optional npm cache directory
 .npm
 
