@@ -8,6 +8,7 @@ const MAX_SOURCE_BYTES = 5 * 1024 * 1024;
 const MAX_AVATAR_LENGTH = 100000;
 let currentUser = null;
 let profileData = {};
+let profileDocumentExists = false;
 let pendingPhotoURL = null;
 let resetAvatar = false;
 
@@ -18,6 +19,7 @@ auth.onAuthStateChanged(async user => {
   }
   currentUser = user;
   const snapshot = await db.collection('users').doc(user.uid).get();
+  profileDocumentExists = snapshot.exists;
   profileData = snapshot.data() || {};
   const name = profileData.displayName || user.displayName || profileData.username || 'My profile';
   document.getElementById('profileName').textContent = name;
@@ -67,6 +69,10 @@ profileForm.addEventListener('submit', async event => {
   saveProfileBtn.textContent = 'Saving…';
   try {
     const update = { displayName, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+    if (!profileDocumentExists) {
+      update.email = currentUser.email || '';
+      update.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+    }
     if (pendingPhotoURL) {
       update.photoURL = pendingPhotoURL;
       update.hasCustomAvatar = true;
@@ -78,6 +84,7 @@ profileForm.addEventListener('submit', async event => {
 
     await currentUser.updateProfile({ displayName, ...(resetAvatar ? { photoURL: null } : {}) });
     await db.collection('users').doc(currentUser.uid).set(update, { merge: true });
+    profileDocumentExists = true;
     profileData = { ...profileData, displayName, ...(pendingPhotoURL ? { photoURL: pendingPhotoURL, hasCustomAvatar: true } : {}) };
     if (resetAvatar) {
       delete profileData.photoURL;

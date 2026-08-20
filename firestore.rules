@@ -23,16 +23,39 @@ service cloud.firestore {
       && request.resource.data.displayName.size() <= 80;
   }
 
+  // Supports older Auth-only accounts that do not yet have a user document.
+  // The signed-in owner can create only their own minimal private profile.
+  function isValidProfileBootstrap() {
+    return request.resource.data.keys().hasOnly([
+      'email', 'displayName', 'photoURL', 'hasCustomAvatar', 'createdAt', 'updatedAt'
+    ])
+      && request.resource.data.email is string
+      && request.resource.data.email == request.auth.token.email
+      && request.resource.data.displayName is string
+      && request.resource.data.displayName.size() >= 1
+      && request.resource.data.displayName.size() <= 80
+      && request.resource.data.createdAt is timestamp
+      && request.resource.data.updatedAt is timestamp
+      && (!('photoURL' in request.resource.data)
+        || (request.resource.data.photoURL is string
+          && request.resource.data.photoURL.size() <= 100000
+          && request.resource.data.photoURL.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
+      && (!('hasCustomAvatar' in request.resource.data)
+        || request.resource.data.hasCustomAvatar is bool);
+  }
+
   function isValidProfileUpdate() {
     return request.resource.data.diff(resource.data).affectedKeys()
-      .hasOnly(['displayName', 'photoURL', 'updatedAt'])
+      .hasOnly(['displayName', 'photoURL', 'hasCustomAvatar', 'updatedAt'])
       && request.resource.data.displayName is string
       && request.resource.data.displayName.size() >= 1
       && request.resource.data.displayName.size() <= 80
       && (!('photoURL' in request.resource.data)
         || (request.resource.data.photoURL is string
           && request.resource.data.photoURL.size() <= 100000
-          && request.resource.data.photoURL.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')));
+          && request.resource.data.photoURL.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$')))
+      && (!('hasCustomAvatar' in request.resource.data)
+        || request.resource.data.hasCustomAvatar is bool);
   }
 
   match /databases/{database}/documents {
@@ -64,7 +87,8 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isOwnDocument(userId);
-      allow create: if isOwnDocument(userId) && isValidProfileCreate();
+      allow create: if isOwnDocument(userId)
+        && (isValidProfileCreate() || isValidProfileBootstrap());
       allow update: if isOwnDocument(userId) && isValidProfileUpdate();
       allow delete: if isOwnDocument(userId);
     }
