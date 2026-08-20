@@ -214,10 +214,17 @@ img{ max-width:100%; display:block; }
 
 .hero-cta{ display:flex; gap:1rem; flex-wrap:wrap; }
 
-.nav-profile{ display:flex; align-items:center; gap:0.45rem; }
-.nav-avatar{ width:28px; height:28px; border-radius:50%; object-fit:cover; border:1px solid var(--border); background:var(--surface-2); }
-.nav-avatar-fallback{ display:grid; place-items:center; color:var(--text-muted); }
-.nav-avatar-fallback svg{ width:17px; height:17px; fill:currentColor; }
+.nav-profile{
+  width:38px; height:38px; padding:0 !important; border-radius:50%;
+  display:grid; place-items:center; color:var(--text-dim); background:rgba(19,29,61,.55);
+  flex:none;
+}
+.nav-profile svg{ width:18px; height:18px; fill:currentColor; }
+.nav-profile:hover,
+.nav-profile:focus-visible{
+  color:var(--cyan); border-color:var(--cyan); background:rgba(52,230,214,.1);
+  box-shadow:0 0 0 4px rgba(52,230,214,.08);
+}
 
 .btn{
   font-family:var(--font-mono); font-size:0.85rem; padding:0.85rem 1.5rem;
@@ -436,6 +443,7 @@ img{ max-width:100%; display:block; }
   .nav-actions{ gap:0.4rem; }
   .nav-admin{ display:none; }
   .nav-btn{ padding:0.35rem 0.6rem !important; font-size:0.72rem !important; }
+  .nav-profile{ width:34px; height:34px; }
   .about-grid{ grid-template-columns:1fr; }
   .photo-frame{ max-width:220px; }
   .contact-grid{ grid-template-columns:1fr; }
