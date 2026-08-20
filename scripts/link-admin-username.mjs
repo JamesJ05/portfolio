@@ -1,9 +1,8 @@
 /**
  * One-time script: link username "JamesJason" to an existing Firebase Auth account.
  *
- * Usage (PowerShell):
- *   $env:FIREBASE_API_KEY='...'; $env:ADMIN_EMAIL='you@example.com';
- *   $env:ADMIN_USERNAME='YourName'; $env:ADMIN_PASSWORD='...'; node scripts/link-admin-username.mjs
+ * Usage:
+ *   node --env-file=.env scripts/link-admin-username.mjs
  */
 import { initializeApp } from 'firebase/app';
 import {

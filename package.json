@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "create-admin": "node --env-file=.env scripts/create-admin.mjs",
+    "link-admin-username": "node --env-file=.env scripts/link-admin-username.mjs"
+  },
   "dependencies": {
     "firebase": "^12.17.1"
   }
