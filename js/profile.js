@@ -1,9 +1,8 @@
 const profileForm = document.getElementById('profileForm');
 const profileStatus = document.getElementById('profileStatus');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
-const profileAvatar = document.getElementById('profileAvatar');
+let profileAvatar = document.getElementById('profileAvatar');
 const avatarInput = document.getElementById('avatarInput');
-const DEFAULT_AVATAR = 'assets/images/profile.jpg';
 const MAX_SOURCE_BYTES = 5 * 1024 * 1024;
 const MAX_AVATAR_LENGTH = 100000;
 let currentUser = null;
@@ -23,7 +22,7 @@ auth.onAuthStateChanged(async user => {
   document.getElementById('profileUsername').textContent = profileData.username ? `@${profileData.username}` : user.email;
   document.getElementById('username').value = profileData.username || '';
   document.getElementById('displayName').value = name;
-  profileAvatar.src = profileData.photoURL || user.photoURL || DEFAULT_AVATAR;
+  setProfileAvatar(profileData.photoURL || user.photoURL);
 });
 
 avatarInput?.addEventListener('change', async () => {
@@ -37,7 +36,7 @@ avatarInput?.addEventListener('change', async () => {
 
   try {
     pendingPhotoURL = await compressAvatar(file);
-    profileAvatar.src = pendingPhotoURL;
+    setProfileAvatar(pendingPhotoURL);
     setProfileStatus('Photo ready. Select Save profile to apply it.');
   } catch (error) {
     console.error(error);
@@ -78,6 +77,32 @@ document.getElementById('logoutBtn').addEventListener('click', () => auth.signOu
 function setProfileStatus(message, isError = false) {
   profileStatus.textContent = message;
   profileStatus.className = `form-status ${isError ? 'err' : 'ok'}`;
+}
+
+function setProfileAvatar(photoURL) {
+  if (photoURL) {
+    if (profileAvatar.tagName !== 'IMG') {
+      const image = document.createElement('img');
+      image.id = 'profileAvatar';
+      image.className = 'profile-avatar';
+      image.alt = 'Profile photo';
+      profileAvatar.replaceWith(image);
+      profileAvatar = image;
+    }
+    profileAvatar.src = photoURL;
+    return;
+  }
+
+  if (profileAvatar.tagName === 'IMG') {
+    const fallback = document.createElement('div');
+    fallback.id = 'profileAvatar';
+    fallback.className = 'profile-avatar profile-avatar-fallback';
+    fallback.setAttribute('role', 'img');
+    fallback.setAttribute('aria-label', 'Default profile icon');
+    fallback.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 1 0 8Zm0 2c-4.1 0-7 2-7 4.5V20h14v-1.5c0-2.5-2.9-4.5-7-4.5Z"/></svg>';
+    profileAvatar.replaceWith(fallback);
+    profileAvatar = fallback;
+  }
 }
 
 async function compressAvatar(file) {
