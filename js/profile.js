@@ -24,7 +24,9 @@ auth.onAuthStateChanged(async user => {
   document.getElementById('profileUsername').textContent = profileData.username ? `@${profileData.username}` : user.email;
   document.getElementById('username').value = profileData.username || '';
   document.getElementById('displayName').value = name;
-  setProfileAvatar(profileData.photoURL);
+  // Legacy profile photos are treated as the default. A photo is only shown
+  // after the user explicitly uploads one from this profile page.
+  setProfileAvatar(profileData.hasCustomAvatar ? profileData.photoURL : null);
 });
 
 avatarInput?.addEventListener('change', async () => {
@@ -65,13 +67,22 @@ profileForm.addEventListener('submit', async event => {
   saveProfileBtn.textContent = 'Saving…';
   try {
     const update = { displayName, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
-    if (pendingPhotoURL) update.photoURL = pendingPhotoURL;
-    if (resetAvatar) update.photoURL = firebase.firestore.FieldValue.delete();
+    if (pendingPhotoURL) {
+      update.photoURL = pendingPhotoURL;
+      update.hasCustomAvatar = true;
+    }
+    if (resetAvatar) {
+      update.photoURL = firebase.firestore.FieldValue.delete();
+      update.hasCustomAvatar = firebase.firestore.FieldValue.delete();
+    }
 
     await currentUser.updateProfile({ displayName, ...(resetAvatar ? { photoURL: null } : {}) });
     await db.collection('users').doc(currentUser.uid).set(update, { merge: true });
-    profileData = { ...profileData, displayName, ...(pendingPhotoURL ? { photoURL: pendingPhotoURL } : {}) };
-    if (resetAvatar) delete profileData.photoURL;
+    profileData = { ...profileData, displayName, ...(pendingPhotoURL ? { photoURL: pendingPhotoURL, hasCustomAvatar: true } : {}) };
+    if (resetAvatar) {
+      delete profileData.photoURL;
+      delete profileData.hasCustomAvatar;
+    }
     pendingPhotoURL = null;
     resetAvatar = false;
     avatarInput.value = '';
@@ -82,7 +93,7 @@ profileForm.addEventListener('submit', async event => {
     setProfileStatus(error.message || 'Could not save your profile.', true);
   } finally {
     saveProfileBtn.disabled = false;
-    saveProfileBtn.textContent = 'Save profile';
+    saveProfileBtn.textContent = 'Save changes';
   }
 });
 
