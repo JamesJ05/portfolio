@@ -52,10 +52,12 @@ async function main() {
     user = cred.user;
     console.log('Signed in to existing account.');
   } catch (err) {
-    if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+    if (err.code === 'auth/user-not-found') {
       const cred = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD);
       user = cred.user;
       console.log('Created new Firebase Auth account.');
+    } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') {
+      throw new Error('The Firebase account already exists, but ADMIN_PASSWORD is incorrect. Reset the password or update .env.');
     } else {
       throw err;
     }
