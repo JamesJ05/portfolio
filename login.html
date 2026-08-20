@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Log in — James Stephen Jason</title>
+<title>Log in</title>
 <meta name="description" content="Log in to manage your portfolio projects and skills." />
 <link rel="icon" type="image/png" href="assets/images/logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,6 @@
     <aside class="auth-brand">
       <a href="index.html" class="logo">
         <img src="assets/images/logo.png" alt="" class="logo-mark" />
-        <span>James Stephen<span class="dot">.</span></span>
       </a>
       <div>
         <h2>Welcome back.</h2>
@@ -41,14 +40,26 @@
 
       <form id="loginForm" class="auth-form">
         <label>
-          Username or email
-          <input type="text" name="identifier" required autocomplete="username" placeholder="JamesJason or you@email.com" />
+          Email address
+          <input type="email" name="identifier" required autocomplete="email" placeholder="you@email.com" />
         </label>
         <label>
           Password
           <input type="password" name="password" required minlength="6" autocomplete="current-password" placeholder="••••••••" />
         </label>
+        <button type="button" class="forgot-password" id="forgotPasswordBtn">Forgot password?</button>
         <button type="submit" class="btn btn-primary" id="loginBtn">Log in</button>
+      </form>
+
+      <form id="resetPasswordForm" class="auth-form reset-password-form" hidden>
+        <p class="reset-copy">Enter your account email. We’ll send a secure password-reset link with a verification code to that inbox.</p>
+        <label>
+          Email address
+          <input type="email" name="resetEmail" required autocomplete="email" placeholder="you@email.com" />
+        </label>
+        <button type="submit" class="btn btn-primary" id="resetPasswordBtn">Send reset email</button>
+        <button type="button" class="forgot-password" id="backToLoginBtn">← Back to log in</button>
+        <p class="form-status" id="resetStatus"></p>
       </form>
 
       <p class="auth-switch">Don't have an account? <a href="register.html">Sign up</a></p>
@@ -63,6 +74,7 @@
 <script src="js/firebase-config.js"></script>
 <script src="js/main.js"></script>
 <script src="js/auth-utils.js"></script>
+<script src="js/forgot-password.js"></script>
 <script src="js/login.js"></script>
 </body>
 </html>

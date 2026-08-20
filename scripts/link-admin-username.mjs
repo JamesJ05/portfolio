@@ -1,11 +1,9 @@
 /**
  * One-time script: link username "JamesJason" to an existing Firebase Auth account.
  *
- * Usage (set your admin email if different):
- *   node scripts/link-admin-username.mjs
- *
- * Or with env vars:
- *   ADMIN_EMAIL=you@email.com ADMIN_USERNAME=JamesJason ADMIN_PASSWORD=Admin2001 node scripts/link-admin-username.mjs
+ * Usage (PowerShell):
+ *   $env:FIREBASE_API_KEY='...'; $env:ADMIN_EMAIL='you@example.com';
+ *   $env:ADMIN_USERNAME='YourName'; $env:ADMIN_PASSWORD='...'; node scripts/link-admin-username.mjs
  */
 import { initializeApp } from 'firebase/app';
 import {
@@ -17,22 +15,25 @@ import {
   getFirestore,
   doc,
   setDoc,
-  getDoc,
   serverTimestamp
 } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBnTpyW6yURDr3te8Sc7aJvWJaBt9azlhU',
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: 'portpolio-8db8d.firebaseapp.com',
   projectId: 'portpolio-8db8d',
-  storageBucket: 'portpolio-8db8d.firebasestorage.app',
   messagingSenderId: '946827032872',
   appId: '1:946827032872:web:a30041a0bed6dc2159b81d'
 };
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'jamesstephen.m.jason@gmail.com';
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'JamesJason';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin2001';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!firebaseConfig.apiKey || !ADMIN_EMAIL || !ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  console.error('Set FIREBASE_API_KEY, ADMIN_EMAIL, ADMIN_USERNAME, and ADMIN_PASSWORD before running this script.');
+  process.exit(1);
+}
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -45,12 +46,6 @@ function normalizeUsername(u) {
 async function main() {
   const key = normalizeUsername(ADMIN_USERNAME);
   const usernameRef = doc(db, 'usernames', key);
-
-  const existing = await getDoc(usernameRef);
-  if (existing.exists()) {
-    console.log(`Username "${ADMIN_USERNAME}" is already linked.`);
-    return;
-  }
 
   let user;
   try {
@@ -69,7 +64,6 @@ async function main() {
 
   await setDoc(usernameRef, {
     uid: user.uid,
-    email: ADMIN_EMAIL,
     username: ADMIN_USERNAME
   });
 
@@ -83,13 +77,10 @@ async function main() {
   console.log('Done.');
   console.log(`  Username: ${ADMIN_USERNAME}`);
   console.log(`  Email:    ${ADMIN_EMAIL}`);
-  console.log('You can now log in with the username or email.');
+  console.log('You can now log in with the email address.');
 }
 
 main().catch(err => {
-  const msg = err.code === 'auth/configuration-not-found'
-    ? 'Email/Password sign-in is not enabled. In Firebase Console → Authentication → Sign-in method → enable Email/Password.'
-    : (err.message || String(err));
-  console.error('Failed:', msg);
+  console.error('Failed:', err.message || err);
   process.exit(1);
 });

@@ -1,7 +1,12 @@
-const API_KEY = 'AIzaSyBnTpyW6yURDr3te8Sc7aJvWJaBt9azlhU';
-const email = 'jamesstephen.m.jason@gmail.com';
-const password = 'Admin2001';
-const displayName = 'JamesJason';
+const API_KEY = process.env.FIREBASE_API_KEY;
+const email = process.env.ADMIN_EMAIL;
+const password = process.env.ADMIN_PASSWORD;
+const displayName = process.env.ADMIN_DISPLAY_NAME || 'Admin';
+
+if (!API_KEY || !email || !password) {
+  console.error('Set FIREBASE_API_KEY, ADMIN_EMAIL, and ADMIN_PASSWORD before running this script.');
+  process.exit(1);
+}
 
 async function createOrSignIn() {
   const signUpUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`;

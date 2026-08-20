@@ -10,44 +10,45 @@
 <link rel="stylesheet" href="../css/style.css" />
 <link rel="stylesheet" href="../css/animations.css" />
 <style>
-  body{ padding:2rem 1.5rem 4rem; }
-  .dash-wrap{ position:relative; z-index:1; max-width:1100px; margin:0 auto; }
-  .dash-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:1.6rem; flex-wrap:wrap; gap:1rem; }
+  body{ min-height:100svh; padding:2.5rem 1.5rem 5rem; }
+  .dash-wrap{ position:relative; z-index:1; max-width:1240px; margin:0 auto; }
+  .dash-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:1.8rem; flex-wrap:wrap; gap:1rem; padding:1.25rem 1.4rem; border:1px solid var(--border); border-radius:16px; background:linear-gradient(120deg,rgba(19,29,61,.92),rgba(10,15,34,.8)); box-shadow:0 18px 45px -34px rgba(79,141,255,.7); }
   .dash-header h1{ font-size:1.5rem; }
   .dash-header .who{ font-family:var(--font-mono); font-size:0.8rem; color:var(--text-faint); }
 
-  .dash-tabs{ display:flex; gap:0.5rem; margin-bottom:1.8rem; flex-wrap:wrap; }
+  .dash-tabs{ display:flex; gap:0.35rem; width:fit-content; margin-bottom:1.6rem; padding:.35rem; border:1px solid var(--border); border-radius:12px; background:rgba(15,23,48,.72); flex-wrap:wrap; }
   .dash-tab{
-    font-family:var(--font-mono); font-size:0.8rem; padding:0.55rem 1rem;
-    border-radius:9px; border:1px solid var(--border); background:transparent;
+    font-family:var(--font-mono); font-size:0.78rem; padding:0.58rem 1rem;
+    border-radius:8px; border:1px solid transparent; background:transparent;
     color:var(--text-dim); cursor:pointer; transition:all .2s;
   }
-  .dash-tab.active, .dash-tab:hover{ border-color:var(--blue-bright); color:var(--blue-bright); }
-  .dash-tab.active{ background:rgba(79,141,255,0.1); }
+  .dash-tab.active, .dash-tab:hover{ border-color:rgba(125,178,255,.6); color:var(--blue-bright); }
+  .dash-tab.active{ background:rgba(79,141,255,.14); box-shadow:inset 0 0 0 1px rgba(125,178,255,.18),0 0 18px -8px rgba(79,141,255,.8); }
 
   .dash-panel{ display:none; }
-  .dash-panel.active{ display:block; }
+  .dash-panel.active{ display:block; animation:dashPanelIn .35s cubic-bezier(.2,.8,.2,1) both; }
 
-  .dash-grid{ display:grid; grid-template-columns:380px 1fr; gap:2rem; align-items:start; }
+  .dash-grid{ display:grid; grid-template-columns:minmax(320px,.82fr) minmax(0,1.45fr); gap:1.5rem; align-items:start; }
   @media (max-width:860px){ .dash-grid{ grid-template-columns:1fr; } }
 
-  .panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.6rem; }
-  .panel h2{ font-size:1.05rem; margin-bottom:1.2rem; }
-  .dash-form{ display:flex; flex-direction:column; gap:0.95rem; }
+  .panel{ background:linear-gradient(145deg,rgba(19,29,61,.98),rgba(14,22,48,.9)); border:1px solid var(--border); border-radius:16px; padding:1.6rem; box-shadow:0 20px 48px -38px rgba(0,0,0,.95); }
+  .panel h2{ font-size:1.05rem; margin-bottom:1.25rem; color:#f0f4ff; }
+  .dash-form{ display:flex; flex-direction:column; gap:1rem; }
   .dash-form label{ display:flex; flex-direction:column; gap:0.4rem; font-family:var(--font-mono); font-size:0.78rem; color:var(--text-dim); }
   .dash-form input, .dash-form textarea{
     background:var(--surface-2); border:1px solid var(--border); border-radius:9px;
-    padding:0.7rem 0.85rem; color:var(--text); font-family:var(--font-body); font-size:0.92rem;
+    padding:0.76rem 0.85rem; color:var(--text); font-family:var(--font-body); font-size:0.92rem; transition:border-color .2s, box-shadow .2s, background .2s;
   }
-  .dash-form input:focus, .dash-form textarea:focus{ outline:none; border-color:var(--blue-bright); }
+  .dash-form input:focus, .dash-form textarea:focus{ outline:none; border-color:var(--blue-bright); background:#172348; box-shadow:0 0 0 3px rgba(79,141,255,.12); }
   .dash-form textarea{ resize:vertical; }
   #imgPreview{ margin-top:0.5rem; max-height:140px; border-radius:8px; display:none; border:1px solid var(--border); }
 
   .admin-list{ display:flex; flex-direction:column; gap:0.9rem; }
   .admin-row{
     display:flex; gap:1rem; align-items:center; background:var(--surface); border:1px solid var(--border);
-    border-radius:12px; padding:0.9rem 1rem;
+    border-radius:12px; padding:1rem 1.1rem; transition:transform .2s ease,border-color .2s ease,background .2s ease;
   }
+  .admin-row:hover{ transform:translateY(-2px); border-color:rgba(125,178,255,.55); background:rgba(19,29,61,.92); }
   .admin-row .thumb{ width:64px; height:64px; border-radius:8px; background:var(--surface-2); flex-shrink:0; overflow:hidden; }
   .admin-row .thumb img{ width:100%; height:100%; object-fit:cover; }
   .admin-row .meta{ flex:1; min-width:0; }
@@ -73,6 +74,7 @@
   }
   .seed-btn:hover{ border-color:var(--cyan); }
   .form-hint{ font-family:var(--font-mono); font-size:0.72rem; color:var(--text-faint); margin-top:-0.3rem; }
+  @keyframes dashPanelIn{ from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
 </style>
 </head>
 <body>
@@ -109,9 +111,10 @@
           <label>GitHub URL <input type="url" id="pGithub" placeholder="https://github.com/you/repo" /></label>
           <label>Live demo URL <input type="url" id="pLive" placeholder="https://..." /></label>
           <label>
-            Project image
-            <input type="file" id="pImageFile" accept="image/*" />
+            Project image path
+            <input type="text" id="pImageUrl" placeholder="../assets/images/project-name.jpg" />
           </label>
+          <p class="password-hint">Add project images to <code>assets/images/</code> in the repository, then paste the path above.</p>
           <img id="imgPreview" alt="Preview" />
           <button type="submit" class="btn btn-primary btn-block" id="saveBtn">Save project</button>
           <button type="button" class="btn btn-ghost btn-block" id="cancelEditBtn" hidden>Cancel edit</button>
@@ -185,9 +188,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="../js/firebase-config.js"></script>
 <script src="../js/main.js"></script>
+<script src="../js/auth-utils.js"></script>
 <script src="../js/admin-dashboard.js"></script>
 </body>
 </html>

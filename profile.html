@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My profile</title>
+<link rel="icon" type="image/png" href="assets/images/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/auth.css" />
+<style>
+  .profile-page{position:relative;z-index:1;min-height:100svh;display:grid;place-items:center;padding:6rem 1.5rem 2rem}
+  .profile-card{width:min(100%,540px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem}
+  .profile-head{display:flex;gap:1.2rem;align-items:center;margin-bottom:2rem}.profile-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;background:var(--surface-2);border:1px solid var(--border)}
+  .profile-head p{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint)}.profile-actions{display:flex;gap:.75rem;margin-top:1.2rem;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<canvas id="net-bg"></canvas>
+<main class="profile-page">
+  <section class="profile-card">
+    <a href="index.html" class="auth-back">← back to site</a>
+    <div class="profile-head">
+      <img id="profileAvatar" class="profile-avatar" src="assets/images/profile.jpg" alt="Profile photo" />
+      <div><h1 id="profileName">My profile</h1><p id="profileUsername">Loading…</p></div>
+    </div>
+    <form id="profileForm" class="auth-form">
+      <label>Username <input id="username" type="text" readonly /></label>
+      <label>Display name <input id="displayName" type="text" required maxlength="60" autocomplete="name" /></label>
+      <p class="password-hint">Profile photos are disabled in the free version. Update <code>assets/images/profile.jpg</code> in your GitHub repository to change the site photo.</p>
+      <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save profile</button>
+    </form>
+    <p class="form-status" id="profileStatus"></p>
+    <div class="profile-actions"><button type="button" class="btn btn-ghost" id="logoutBtn">Log out</button></div>
+  </section>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

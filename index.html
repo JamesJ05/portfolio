@@ -26,17 +26,17 @@
   <div class="nav-inner">
     <a href="#top" class="logo">
       <img src="assets/images/logo.png" alt="" class="logo-mark" />
-      <span>James Stephen<span class="dot">.</span></span>
+      <span class="nav-brand-label" id="navUsername">Aspiring IT Professional<span class="dot">.</span></span>
     </a>
     <nav class="nav-links">
       <a href="#about">about</a>
       <a href="#experience">experience</a>
+      <a href="#education">education</a>
       <a href="#skills">skills</a>
       <a href="#projects">projects</a>
       <a href="#contact">contact</a>
     </nav>
     <div class="nav-actions">
-      <a href="assets/resume.pdf" target="_blank" class="nav-admin">↓ résumé</a>
       <div class="auth-nav" id="authNav">
         <a href="login.html" class="btn btn-ghost nav-btn">Log in</a>
         <a href="register.html" class="btn btn-primary nav-btn">Sign up</a>
@@ -50,14 +50,14 @@
 <section class="hero" id="top">
   <div class="hero-inner">
     <div class="hero-text">
-      <p class="eyebrow reveal">// hello, world</p>
+      <p class="eyebrow reveal">// aspiring IT professional</p>
       <h1 class="hero-title reveal">
-        <span class="line">I build systems</span>
-        <span class="line">that <span class="accent">hold up</span> under load.</span>
+        <span class="line">I build practical systems</span>
+        <span class="line">and <span class="accent">keep learning</span> every day.</span>
       </h1>
       <p class="hero-lede reveal">
         Computer Engineering graduate specializing in Java &amp; Spring Boot — backend
-        systems, role-based access control, and APIs built to survive production.
+        systems, web applications, networking, and hands-on technical support.
       </p>
       <div class="hero-cta reveal">
         <a href="#projects" class="btn btn-primary">View projects</a>
@@ -66,15 +66,24 @@
     </div>
 
     <div class="hero-visual reveal">
-      <div class="terminal">
-        <div class="terminal-bar"><span></span><span></span><span></span><p>developer.java</p></div>
-        <pre class="terminal-body"><code><span class="tk-kw">public class</span> <span class="tk-cl">Developer</span> {
-    <span class="tk-kw">private</span> String name = <span class="tk-str">"James Stephen Jason"</span>;
-    <span class="tk-kw">private</span> String alias = <span class="tk-str">"JHAZZ"</span>;
-    <span class="tk-kw">private</span> String role = <span class="tk-str">"Java Developer"</span>;
-    <span class="tk-kw">private</span> String[] stack = {<span class="tk-str">"Java"</span>, <span class="tk-str">"Spring Boot"</span>, <span class="tk-str">"React"</span>, <span class="tk-str">"Firebase"</span>};
-    <span class="tk-kw">private</span> <span class="tk-kw">boolean</span> openToWork = <span class="tk-kw">true</span><span class="cursor">|</span>
-}</code></pre>
+      <div class="dev-scene" aria-hidden="true">
+        <div class="scene-orbit"></div>
+        <span class="scene-spark spark-one"></span><span class="scene-spark spark-two"></span>
+        <span class="scene-spark spark-three"></span><span class="scene-spark spark-four"></span>
+        <div class="scene-beam"><i></i></div>
+        <div class="scene-platform">
+          <div class="platform-top"></div><div class="platform-front"></div><div class="platform-side"></div>
+          <div class="scene-server"><span></span><span></span><span></span></div>
+          <div class="scene-gear gear-large"><i></i></div>
+          <div class="scene-gear gear-small"><i></i></div>
+          <div class="scene-code"><b>&lt;/&gt;</b><i></i><i></i><i></i></div>
+          <div class="scene-person person-main"><i class="person-head"></i><i class="person-body"></i><i class="person-arm arm-left"></i><i class="person-arm arm-right"></i></div>
+          <div class="scene-person person-left"><i class="person-head"></i><i class="person-body"></i></div>
+          <div class="scene-person person-right"><i class="person-head"></i><i class="person-body"></i></div>
+        </div>
+        <div class="scene-tag tag-java">JAVA</div>
+        <div class="scene-tag tag-api">REST API</div>
+        <div class="scene-tag tag-live"><span></span>BUILDING</div>
       </div>
 
       <div class="id-card">
@@ -89,7 +98,6 @@
       </div>
     </div>
   </div>
-  <a href="#about" class="scroll-cue" aria-label="Scroll down"><span></span></a>
 </section>
 
 <!-- ===== ABOUT ===== -->
@@ -99,11 +107,16 @@
       <div class="photo-frame">
         <img src="assets/images/profile.jpg" alt="Portrait of James Stephen Jason" id="profileImg">
       </div>
+      <div class="photo-availability"><span class="status-dot"></span>Open to junior IT roles</div>
+      <a class="about-linkedin" href="https://linkedin.com/in/jamesjason5" target="_blank" rel="noopener" aria-label="Visit James's LinkedIn profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.1 3.5A2.1 2.1 0 1 1 5 7.7a2.1 2.1 0 0 1 .1-4.2ZM3.2 9h3.7v12H3.2V9Zm6 0h3.5v1.6h.1c.5-.9 1.7-2 3.6-2 3.8 0 4.5 2.5 4.5 5.8V21h-3.7v-5.7c0-1.4 0-3.1-1.9-3.1s-2.2 1.5-2.2 3V21H9.2V9Z"/></svg>
+        <span>Connect on LinkedIn</span>
+      </a>
       <p class="photo-caption">Bulacan, Philippines</p>
     </div>
     <div class="about-copy reveal">
       <p class="eyebrow">about</p>
-      <h2>Computer Engineering grad, chasing enterprise Java.</h2>
+      <h2>Hi, I’m James — an aspiring IT professional.</h2>
       <p>
         I'm James Stephen M. Jason — known online as JHAZZ — a Computer Engineering
         graduate from Bulacan State University (BulSU), graduated June 2026. I build
@@ -164,6 +177,16 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ===== EDUCATION ===== -->
+<section class="section" id="education">
+  <div class="section-inner">
+    <p class="eyebrow reveal">education</p>
+    <h2 class="reveal">Academic foundation.</h2>
+    <p class="section-sub reveal">The learning and hands-on work that shaped my path into IT.</p>
+    <div class="timeline reveal" id="educationTimeline"></div>
   </div>
 </section>
 
@@ -254,7 +277,7 @@
   <div class="footer-inner">
     <a href="#top" class="logo">
       <img src="assets/images/logo.png" alt="" class="logo-mark" />
-      <span>James Stephen<span class="dot">.</span></span>
+      <span id="footerUsername">Guest<span class="dot">.</span></span>
     </a>
     <div class="footer-links">
       <a href="mailto:jamesstephen.m.jason@gmail.com">Email</a>
@@ -276,6 +299,7 @@
 
 <script src="js/firebase-config.js"></script>
 <script src="js/main.js"></script>
+<script src="js/auth-utils.js"></script>
 <script src="js/nav-auth.js"></script>
 <script src="js/skills.js"></script>
 <script src="js/projects.js"></script>

@@ -29,20 +29,17 @@ registerForm?.addEventListener('submit', async (e) => {
   let cred = null;
 
   try {
-    const available = await isUsernameAvailable(username);
-    if (!available) {
-      throw { code: 'username-taken', message: friendlyAuthError({ code: 'username-taken' }) };
-    }
-
     cred = await auth.createUserWithEmailAndPassword(email, password);
     if (displayName) {
       await cred.user.updateProfile({ displayName });
     }
     await saveUsernameProfile(cred.user.uid, username, email, displayName);
 
-    window.location.href = 'admin/dashboard.html';
+    window.location.href = 'profile.html';
   } catch (err) {
-    console.error('Register error:', err);
+    if (err.code === 'permission-denied' && cred?.user) {
+      err = { code: 'username-taken', message: friendlyAuthError({ code: 'username-taken' }) };
+    }
     if (cred?.user) {
       try { await cred.user.delete(); } catch (_) { /* ignore cleanup failure */ }
     }

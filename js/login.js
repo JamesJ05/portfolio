@@ -15,10 +15,9 @@ loginForm?.addEventListener('submit', async (e) => {
 
   try {
     const email = await resolveLoginEmail(identifier);
-    await auth.signInWithEmailAndPassword(email, password);
-    window.location.href = 'admin/dashboard.html';
+    const credential = await auth.signInWithEmailAndPassword(email, password);
+    window.location.href = await isAdmin(credential.user.uid) ? 'admin/dashboard.html' : 'profile.html';
   } catch (err) {
-    console.error('Login error:', err);
     setAuthStatus(authStatus, friendlyAuthError(err), true);
     loginBtn.disabled = false;
     loginBtn.textContent = 'Log in';

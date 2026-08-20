@@ -6,7 +6,7 @@ function friendlyAuthError(err) {
     'auth/email-already-in-use': 'That email is already registered — log in instead.',
     'auth/invalid-email': 'That email address looks invalid.',
     'auth/weak-password': 'Password should be at least 6 characters.',
-    'auth/user-not-found': 'No account found with that username or email.',
+    'auth/user-not-found': 'No account found with that email address.',
     'auth/wrong-password': 'Incorrect password.',
     'auth/invalid-credential': 'Incorrect username/email or password.',
     'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
@@ -23,9 +23,15 @@ function setAuthStatus(el, msg, isError = false) {
   el.className = 'form-status ' + (isError ? 'err' : msg ? 'ok' : '');
 }
 
-function redirectIfAuthenticated(dashboardPath = 'admin/dashboard.html') {
-  auth.onAuthStateChanged(user => {
-    if (user) window.location.href = dashboardPath;
+async function isAdmin(uid) {
+  return uid === ADMIN_UID;
+}
+
+function redirectIfAuthenticated() {
+  auth.onAuthStateChanged(async user => {
+    if (!user) return;
+    const destination = await isAdmin(user.uid) ? 'admin/dashboard.html' : 'profile.html';
+    window.location.href = destination;
   });
 }
 
@@ -42,30 +48,14 @@ function isEmail(value) {
 }
 
 /**
- * Resolves a login identifier (username or email) to the Firebase auth email.
+ * Email-only sign-in avoids exposing an email lookup directory to the public.
  */
 async function resolveLoginEmail(identifier) {
   const value = identifier.trim();
-  if (!value) throw { code: 'auth/invalid-credential', message: 'Enter your username or email.' };
+  if (!value) throw { code: 'auth/invalid-credential', message: 'Enter your email address.' };
 
   if (isEmail(value)) return value;
-
-  const key = normalizeUsername(value);
-  const snap = await db.collection('usernames').doc(key).get();
-  if (!snap.exists) throw { code: 'username-not-found', message: friendlyAuthError({ code: 'username-not-found' }) };
-
-  const data = snap.data();
-  if (!data.email) throw { code: 'username-not-found', message: friendlyAuthError({ code: 'username-not-found' }) };
-  return data.email;
-}
-
-/**
- * Checks whether a username is available before registration.
- */
-async function isUsernameAvailable(username) {
-  const key = normalizeUsername(username);
-  const snap = await db.collection('usernames').doc(key).get();
-  return !snap.exists;
+  throw { code: 'auth/invalid-credential', message: 'Sign in with your email address.' };
 }
 
 /**
@@ -83,7 +73,6 @@ async function saveUsernameProfile(uid, username, email, displayName) {
     }
     tx.set(usernameRef, {
       uid,
-      email,
       username: username.trim()
     });
     tx.set(userRef, {

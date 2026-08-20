@@ -1,5 +1,3 @@
-const storage = firebase.storage ? firebase.storage() : null;
-
 const whoami = document.getElementById('whoami');
 const logoutBtn = document.getElementById('logoutBtn');
 
@@ -20,6 +18,10 @@ auth.onAuthStateChanged(async user => {
     return;
   }
   try {
+    if (!(await isAdmin(user.uid))) {
+      window.location.replace('../profile.html');
+      return;
+    }
     const profile = await db.collection('users').doc(user.uid).get();
     const username = profile.data()?.username;
     whoami.textContent = username
@@ -52,19 +54,14 @@ const pDescription = document.getElementById('pDescription');
 const pTech = document.getElementById('pTech');
 const pGithub = document.getElementById('pGithub');
 const pLive = document.getElementById('pLive');
-const pImageFile = document.getElementById('pImageFile');
+const pImageUrl = document.getElementById('pImageUrl');
 
 let currentImageUrl = '';
 
-pImageFile.addEventListener('change', () => {
-  const file = pImageFile.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    imgPreview.src = e.target.result;
-    imgPreview.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
+pImageUrl.addEventListener('input', () => {
+  const imageUrl = pImageUrl.value.trim();
+  imgPreview.src = imageUrl;
+  imgPreview.style.display = imageUrl ? 'block' : 'none';
 });
 
 form.addEventListener('submit', async (e) => {
@@ -74,16 +71,7 @@ form.addEventListener('submit', async (e) => {
   setStatus(dashStatus, '');
 
   try {
-    let imageUrl = currentImageUrl;
-    const file = pImageFile.files[0];
-
-    if (file) {
-      if (!storage) throw new Error('Firebase Storage script not loaded.');
-      const path = `project-images/${Date.now()}-${file.name}`;
-      const ref = storage.ref().child(path);
-      await ref.put(file);
-      imageUrl = await ref.getDownloadURL();
-    }
+    const imageUrl = pImageUrl.value.trim() || currentImageUrl;
 
     const data = {
       title: pTitle.value.trim(),
@@ -121,6 +109,7 @@ function resetProjectForm() {
   form.reset();
   editId.value = '';
   currentImageUrl = '';
+  pImageUrl.value = '';
   imgPreview.style.display = 'none';
   formTitle.textContent = 'Add a project';
   cancelEditBtn.hidden = true;
@@ -168,6 +157,7 @@ function fillFormForEdit(id, p) {
   pGithub.value = p.githubUrl || '';
   pLive.value = p.liveUrl || '';
   currentImageUrl = p.imageUrl || '';
+  pImageUrl.value = currentImageUrl;
   if (currentImageUrl) {
     imgPreview.src = currentImageUrl;
     imgPreview.style.display = 'block';
