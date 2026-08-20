@@ -13,7 +13,7 @@
 <style>
   .profile-page{position:relative;z-index:1;min-height:100svh;display:grid;place-items:center;padding:6rem 1.5rem 2rem}
   .profile-card{width:min(100%,540px);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem}
-  .profile-head{display:flex;gap:1.2rem;align-items:center;margin-bottom:2rem}.profile-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;background:var(--surface-2);border:1px solid var(--border)}.auth-form .profile-default-avatar{width:max-content;margin-top:-.2rem;padding:.5rem .8rem;border:1px solid var(--border);background:transparent;color:var(--text-dim)}.auth-form .profile-default-avatar:hover{border-color:var(--cyan);color:var(--cyan)}
+  .profile-head{display:flex;gap:1.2rem;align-items:center;margin-bottom:2rem}.profile-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;background:rgba(19,29,61,.55);border:1px solid var(--border)}.profile-avatar-icon{display:grid;place-items:center;color:var(--text-dim)}.profile-avatar-icon svg{width:18px;height:18px;fill:currentColor}.auth-form .profile-default-avatar{width:max-content;margin-top:-.2rem;padding:.5rem .8rem;border:1px solid var(--border);background:transparent;color:var(--text-dim)}.auth-form .profile-default-avatar:hover{border-color:var(--cyan);color:var(--cyan)}
   .profile-head p{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint)}.profile-actions{display:flex;gap:.75rem;margin-top:1.2rem;flex-wrap:wrap}.profile-photo-input{font:inherit;font-size:.82rem}.profile-photo-input::file-selector-button{margin-right:.7rem;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);padding:.45rem .65rem;font:inherit;cursor:pointer}
 </style>
 </head>
@@ -23,7 +23,9 @@
   <section class="profile-card">
     <a href="index.html" class="auth-back">← back to site</a>
     <div class="profile-head">
-      <img id="profileAvatar" class="profile-avatar" src="https://api.dicebear.com/10.x/bottts-neutral/svg?seed=portfolio-default&amp;backgroundColor=0f1730" alt="Default profile avatar" />
+      <div id="profileAvatar" class="profile-avatar profile-avatar-icon" role="img" aria-label="Default profile avatar">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 1 0 8Zm0 2c-4.1 0-7 2-7 4.5V20h14v-1.5c0-2.5-2.9-4.5-7-4.5Z"/></svg>
+      </div>
       <div><h1 id="profileName">My profile</h1><p id="profileUsername">Loading…</p></div>
     </div>
     <form id="profileForm" class="auth-form">

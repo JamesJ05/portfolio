@@ -1,10 +1,9 @@
 const profileForm = document.getElementById('profileForm');
 const profileStatus = document.getElementById('profileStatus');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
-const profileAvatar = document.getElementById('profileAvatar');
+let profileAvatar = document.getElementById('profileAvatar');
 const avatarInput = document.getElementById('avatarInput');
 const useDefaultAvatarBtn = document.getElementById('useDefaultAvatarBtn');
-const DEFAULT_AVATAR = 'https://api.dicebear.com/10.x/bottts-neutral/svg?seed=portfolio-default&backgroundColor=0f1730';
 const MAX_SOURCE_BYTES = 5 * 1024 * 1024;
 const MAX_AVATAR_LENGTH = 100000;
 let currentUser = null;
@@ -95,8 +94,29 @@ function setProfileStatus(message, isError = false) {
 }
 
 function setProfileAvatar(photoURL) {
-  profileAvatar.src = photoURL || DEFAULT_AVATAR;
-  profileAvatar.alt = photoURL ? 'Profile photo' : 'Default profile avatar';
+  if (photoURL) {
+    if (profileAvatar.tagName !== 'IMG') {
+      const image = document.createElement('img');
+      image.id = 'profileAvatar';
+      image.className = 'profile-avatar';
+      image.alt = 'Profile photo';
+      profileAvatar.replaceWith(image);
+      profileAvatar = image;
+    }
+    profileAvatar.src = photoURL;
+    return;
+  }
+
+  if (profileAvatar.tagName === 'IMG') {
+    const fallback = document.createElement('div');
+    fallback.id = 'profileAvatar';
+    fallback.className = 'profile-avatar profile-avatar-icon';
+    fallback.setAttribute('role', 'img');
+    fallback.setAttribute('aria-label', 'Default profile avatar');
+    fallback.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 1 0 8Zm0 2c-4.1 0-7 2-7 4.5V20h14v-1.5c0-2.5-2.9-4.5-7-4.5Z"/></svg>';
+    profileAvatar.replaceWith(fallback);
+    profileAvatar = fallback;
+  }
 }
 
 async function compressAvatar(file) {
