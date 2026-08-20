@@ -15,7 +15,9 @@
   }
 
   function renderSignedInNav(user, data, admin) {
-    const hasCustomAvatar = data.hasCustomAvatar === true && typeof data.photoURL === 'string' && data.photoURL;
+    // Match the profile page's condition exactly so both views display the
+    // same saved avatar, including profiles created before the current schema.
+    const hasCustomAvatar = data.hasCustomAvatar && typeof data.photoURL === 'string' && data.photoURL;
     const avatar = hasCustomAvatar
       ? `<img class="nav-profile-image" src="${data.photoURL}" alt="" />`
       : '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-4.1 0-7 2-7 4.5V20h14v-1.5c0-2.5-2.9-4.5-7-4.5Z"/></svg>';
