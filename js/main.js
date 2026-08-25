@@ -60,9 +60,11 @@ revealItems.forEach(el => revealObserver.observe(el));
   function drawAtmosphere(time){
     ctx.fillStyle = '#060a16';
     ctx.fillRect(0, 0, w, h);
+    const depthX = prefersReducedMotion ? 0 : ((pointer.x / Math.max(w, 1)) - 0.5) * 22;
+    const depthY = prefersReducedMotion ? 0 : ((pointer.y / Math.max(h, 1)) - 0.5) * 14 - Math.min(window.scrollY * 0.018, 18);
     const glows = [
-      { x:w * (.18 + Math.sin(time * .00011) * .05), y:h * (.1 + Math.cos(time * .00013) * .05), r:Math.max(w,h) * .58, color:'79,141,255' },
-      { x:w * (.88 + Math.cos(time * .00009) * .04), y:h * (.2 + Math.sin(time * .00012) * .06), r:Math.max(w,h) * .46, color:'52,230,214' }
+      { x:w * (.18 + Math.sin(time * .00011) * .05) + depthX, y:h * (.1 + Math.cos(time * .00013) * .05) + depthY, r:Math.max(w,h) * .58, color:'79,141,255' },
+      { x:w * (.88 + Math.cos(time * .00009) * .04) - depthX * .7, y:h * (.2 + Math.sin(time * .00012) * .06) - depthY * .6, r:Math.max(w,h) * .46, color:'52,230,214' }
     ];
     glows.forEach(g => {
       const gradient = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, g.r);

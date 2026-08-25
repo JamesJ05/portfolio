@@ -87,7 +87,7 @@
       </div>
 
       <div class="id-card">
-        <div class="id-photo" aria-hidden="true">
+        <div class="id-photo">
           <img src="assets/images/profile.jpg" alt="James Stephen Jason" />
         </div>
         <div class="id-meta">
@@ -104,22 +104,23 @@
 <section class="section" id="about">
   <div class="section-inner about-grid">
     <div class="about-photo reveal">
+      <span class="about-identity">01 / IDENTITY</span>
       <div class="photo-frame">
-        <span class="photo-frame-label">01 / identity</span>
         <img src="assets/images/profile.jpg" alt="Portrait of James Stephen Jason" id="profileImg">
-        <span class="photo-frame-corner photo-frame-corner-tl" aria-hidden="true"></span>
-        <span class="photo-frame-corner photo-frame-corner-br" aria-hidden="true"></span>
+        <span class="photo-scan-line"></span>
+        <span class="hud-corner corner-top-left"></span><span class="hud-corner corner-top-right"></span>
+        <span class="hud-corner corner-bottom-left"></span><span class="hud-corner corner-bottom-right"></span>
       </div>
       <div class="photo-availability"><span class="status-dot"></span>Open to junior IT roles</div>
       <a class="about-linkedin" href="https://linkedin.com/in/jamesjason5" target="_blank" rel="noopener" aria-label="Visit James's LinkedIn profile">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.1 3.5A2.1 2.1 0 1 1 5 7.7a2.1 2.1 0 0 1 .1-4.2ZM3.2 9h3.7v12H3.2V9Zm6 0h3.5v1.6h.1c.5-.9 1.7-2 3.6-2 3.8 0 4.5 2.5 4.5 5.8V21h-3.7v-5.7c0-1.4 0-3.1-1.9-3.1s-2.2 1.5-2.2 3V21H9.2V9Z"/></svg>
-        <span>Connect on LinkedIn</span>
+        <span>Connect on LinkedIn</span><span class="button-arrow" aria-hidden="true">↗</span>
       </a>
       <p class="photo-caption">Bulacan, Philippines</p>
     </div>
     <div class="about-copy reveal">
       <p class="eyebrow">about</p>
-      <h2>Hi, I’m James — an aspiring IT professional.</h2>
+      <h2>Hi, I’m James — an aspiring <span class="accent">IT professional.</span></h2>
       <p>
         A Computer Engineering graduate. I like
         understanding how things actually work, not just getting them to run 
@@ -141,11 +142,16 @@
         to use, keep learning, and actually contribute to a team.
       </p>
       <div class="about-stats">
-        <div><strong>3</strong><span>major systems shipped</span></div>
-        <div><strong>Java</strong><span>primary language</span></div>
-        <div><strong>4</strong><span>certifications earned</span></div>
+        <div class="about-stat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4m8-8 4 4-4 4M14 4l-4 16"/></svg>
+          <strong>3</strong><span>major systems shipped</span>
+        </div>
+        <div class="about-stat">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.5 2.1 3.2-.2.8 3.1 2.5 2-.9 3 1.1 3-2.6 1.8-.9 3.1-3.2-.3L12 21l-2.5-2.1-3.2.2-.8-3.1-2.5-2 .9-3-1.1-3 2.6-1.8.9-3.1 3.2.3L12 3Zm-3.1 9.2 2.1 2.1 4.3-4.4"/></svg>
+          <strong>4</strong><span>certifications earned</span>
+        </div>
       </div>
-      <a href="assets/resume.pdf" target="_blank" class="btn btn-ghost resume-btn">Download résumé ↓</a>
+      <a href="assets/resume.pdf" target="_blank" class="btn btn-ghost resume-btn"><span>Download résumé</span><span aria-hidden="true">↓</span></a>
     </div>
   </div>
 </section>
