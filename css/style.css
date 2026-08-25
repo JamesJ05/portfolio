@@ -70,6 +70,15 @@ img{ max-width:100%; display:block; }
   position:fixed; inset:0; width:100%; height:100%;
   z-index:0; background:var(--bg); pointer-events:none;
 }
+.ambient-light,
+.ambient-grid,
+.ambient-shimmer{ position:fixed; inset:0; pointer-events:none; }
+.ambient-light{ z-index:0; opacity:.5; filter:blur(18px); mix-blend-mode:screen; }
+.ambient-light-one{ background:radial-gradient(ellipse 42% 30% at 17% 20%, rgba(79,141,255,.16), transparent 72%); animation:luxuryDriftOne 18s ease-in-out infinite alternate; }
+.ambient-light-two{ background:radial-gradient(ellipse 34% 38% at 87% 72%, rgba(52,230,214,.11), transparent 70%); animation:luxuryDriftTwo 23s ease-in-out infinite alternate; }
+.ambient-grid{ z-index:0; opacity:.17; background-image:linear-gradient(rgba(125,178,255,.11) 1px, transparent 1px),linear-gradient(90deg,rgba(125,178,255,.11) 1px, transparent 1px); background-size:76px 76px; transform:perspective(700px) rotateX(58deg) scale(1.6) translateY(30%); transform-origin:center bottom; mask-image:linear-gradient(to top,rgba(0,0,0,.7),transparent 68%); animation:gridDrift 26s linear infinite; }
+.ambient-shimmer{ z-index:0; overflow:hidden; opacity:.22; }
+.ambient-shimmer::before{ content:''; position:absolute; width:42%; height:140%; top:-20%; left:-50%; background:linear-gradient(105deg,transparent 35%,rgba(125,178,255,.14) 48%,rgba(52,230,214,.08) 51%,transparent 64%); transform:rotate(8deg); animation:luxurySweep 19s ease-in-out infinite; }
 
 /* subtle film grain for depth — keeps flat dark sections from feeling empty */
 .grain{

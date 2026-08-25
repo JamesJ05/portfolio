@@ -41,6 +41,22 @@
   78%{ top:92%; opacity:.45; }
   88%,100%{ top:92%; opacity:0; }
 }
+@keyframes luxuryDriftOne{
+  0%{ transform:translate3d(-3%, -2%, 0) scale(.9); }
+  100%{ transform:translate3d(8%, 6%, 0) scale(1.12); }
+}
+@keyframes luxuryDriftTwo{
+  0%{ transform:translate3d(4%, 3%, 0) scale(1.05); }
+  100%{ transform:translate3d(-7%, -5%, 0) scale(.88); }
+}
+@keyframes gridDrift{
+  to{ background-position:76px 76px; }
+}
+@keyframes luxurySweep{
+  0%, 22%{ transform:translateX(0) rotate(8deg); opacity:0; }
+  38%{ opacity:1; }
+  72%, 100%{ transform:translateX(390%) rotate(8deg); opacity:0; }
+}
 @keyframes sceneFloat{
   0%,100%{ transform:translate(-50%,-50%) translateY(0); }
   50%{ transform:translate(-50%,-50%) translateY(-9px); }
