@@ -67,6 +67,15 @@
   0%,100%{ opacity:.45; transform:scale(.8); }
   50%{ opacity:1; transform:scale(1.2); }
 }
+@keyframes photoScan{
+  0%,100%{ transform:translateY(-110%); opacity:0; }
+  18%,72%{ opacity:.75; }
+  88%{ transform:translateY(110%); opacity:0; }
+}
+@keyframes photoSheen{
+  0%,56%,100%{ transform:translateX(-125%); }
+  76%{ transform:translateX(125%); }
+}
 /* Motion timing mirrored from the source isometric SVG: staggered objects,
    independent gear rotation, and signals that breathe rather than snap. */
 @keyframes sourceLift{
