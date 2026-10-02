@@ -9,13 +9,11 @@
   const loading = document.getElementById('projectsLoading');
   if (!grid) return;
 
-  let projectsCache = [];
-
   db.collection('projects')
     .orderBy('createdAt', 'desc')
-    .get()
-    .then(snapshot => {
+    .onSnapshot(snapshot => {
       loading?.remove();
+      grid.replaceChildren();
 
       if (snapshot.empty){
         grid.innerHTML = `<p class="projects-empty">No projects uploaded yet — check back soon, or log in to the admin dashboard to add the first one.</p>`;
@@ -24,8 +22,6 @@
 
       snapshot.forEach((doc, index) => {
         const p = doc.data();
-        projectsCache.push(p);
-
         const card = document.createElement('article');
         card.className = 'project-card';
         card.style.animationDelay = `${index * 60}ms`;
@@ -57,10 +53,9 @@
 
         grid.appendChild(card);
       });
-    })
-    .catch(err => {
+    }, err => {
       console.error('Failed to load projects:', err);
-      loading.textContent = 'Could not load projects right now.';
+      if (loading) loading.textContent = 'Could not load projects right now.';
     });
 
   /* ---------- Modal ---------- */

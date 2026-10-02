@@ -91,7 +91,7 @@ form.addEventListener('submit', async (e) => {
 
   try {
     const projectId = editId.value || db.collection('projects').doc().id;
-    const newImageUrls = await uploadProjectImages([...pImages.files], projectId);
+    const imageFiles = [...pImages.files];
     let previousImages = [];
     if (editId.value) {
       const existingProject = await db.collection('projects').doc(projectId).get();
@@ -100,29 +100,44 @@ form.addEventListener('submit', async (e) => {
         ? existingData.imageUrls
         : (existingData.imageUrl ? [existingData.imageUrl] : []);
     }
-    const savedImages = [...previousImages, ...newImageUrls];
-
     const data = {
       title: pTitle.value.trim(),
       description: pDescription.value.trim(),
       techStack: pTech.value.split(',').map(t => t.trim()).filter(Boolean),
       githubUrl: pGithub.value.trim(),
       liveUrl: pLive.value.trim(),
-      imageUrls: savedImages,
-      imageUrl: savedImages[0] || '',
+      imageUrls: previousImages,
+      imageUrl: previousImages[0] || '',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     if (editId.value) {
       await db.collection('projects').doc(projectId).update(data);
-      setStatus(dashStatus, 'Project updated.', false);
     } else {
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       await db.collection('projects').doc(projectId).set(data);
-      setStatus(dashStatus, 'Project added.', false);
     }
 
+    const wasEditing = Boolean(editId.value);
     resetProjectForm();
+    loadAdminProjects();
+
+    try {
+      const newImageUrls = await uploadProjectImages(imageFiles, projectId);
+      if (newImageUrls.length) {
+        const savedImages = [...previousImages, ...newImageUrls];
+        await db.collection('projects').doc(projectId).update({
+          imageUrls: savedImages,
+          imageUrl: savedImages[0] || '',
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      setStatus(dashStatus, wasEditing ? 'Project updated.' : 'Project added.', false);
+    } catch (uploadError) {
+      console.error('Project was saved, but photo upload failed:', uploadError);
+      setStatus(dashStatus, `Project saved, but photo upload failed: ${uploadError.message}. Edit the project to retry.`, true);
+    }
+
     loadAdminProjects();
   } catch (err) {
     console.error(err);
