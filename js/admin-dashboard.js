@@ -221,20 +221,34 @@ function loadAdminProjects() {
           : (typeof p.techStack === 'string' ? p.techStack.split(',').map(item => item.trim()).filter(Boolean) : []);
         const row = document.createElement('div');
         row.className = 'admin-row';
-        row.innerHTML = `
-          <div class="thumb">${images[0] ? `<img src="${escapeAttr(images[0])}" alt="">` : ''}</div>
-          <div class="meta">
-            <h3>${escapeHtml(p.title || 'Untitled')}</h3>
-            <p>${escapeHtml(techStack.join(', '))}</p>
-          </div>
-          <div class="row-actions">
-            <button data-action="edit">Edit</button>
-            <button data-action="delete" class="danger">Delete</button>
-          </div>
-        `;
-        row.querySelector('[data-action="edit"]').addEventListener('click', () => fillFormForEdit(doc.id, p));
-        row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteProject(doc.id));
-        const thumb = row.querySelector('.thumb');
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        if (images[0]) {
+          const thumbImage = document.createElement('img');
+          thumbImage.src = images[0];
+          thumbImage.alt = '';
+          thumb.appendChild(thumbImage);
+        }
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const title = document.createElement('h3');
+        title.textContent = typeof p.title === 'string' && p.title.trim() ? p.title : 'Untitled';
+        const stack = document.createElement('p');
+        stack.textContent = techStack.map(item => String(item ?? '')).join(', ');
+        meta.append(title, stack);
+        const actions = document.createElement('div');
+        actions.className = 'row-actions';
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => fillFormForEdit(doc.id, p));
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'danger';
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => deleteProject(doc.id));
+        actions.append(editButton, deleteButton);
+        row.append(thumb, meta, actions);
         const thumbImage = thumb.querySelector('img');
         if (thumbImage) {
           thumbImage.dataset.fallback = getDriveImageFallback(images[0]);
@@ -264,6 +278,7 @@ function loadAdminProjects() {
   });
 }
 function projectCreatedAt(project) {
+  if (!project || typeof project !== 'object') return 0;
   const value = project.createdAt;
   if (value && typeof value.toMillis === 'function') return value.toMillis();
   const parsed = value ? Date.parse(value) : 0;
@@ -595,6 +610,3 @@ function escapeHtml(str) {
   }[m]));
 }
 
-function escapeAttr(str) {
-  return escapeHtml(str);
-}
