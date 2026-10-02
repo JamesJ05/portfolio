@@ -176,28 +176,44 @@ function loadAdminProjects() {
     }
     const docs = [...snapshot.docs].sort((a, b) => projectCreatedAt(b.data()) - projectCreatedAt(a.data()));
     docs.forEach(doc => {
-      const p = doc.data();
-      const rawImages = Array.isArray(p.imageUrls) ? p.imageUrls : (typeof p.imageUrl === 'string' && p.imageUrl ? [p.imageUrl] : []);
-      const images = rawImages.filter(url => typeof url === 'string' && url.trim()).map(normalizeDriveImageUrl);
-      const techStack = Array.isArray(p.techStack)
-        ? p.techStack
-        : (typeof p.techStack === 'string' ? p.techStack.split(',').map(item => item.trim()).filter(Boolean) : []);
-      const row = document.createElement('div');
-      row.className = 'admin-row';
-      row.innerHTML = `
-        <div class="thumb">${images[0] ? `<img src="${escapeAttr(images[0])}" alt="">` : ''}</div>
-        <div class="meta">
-          <h3>${escapeHtml(p.title || 'Untitled')}</h3>
-          <p>${escapeHtml(techStack.join(', '))}</p>
-        </div>
-        <div class="row-actions">
-          <button data-action="edit">Edit</button>
-          <button data-action="delete" class="danger">Delete</button>
-        </div>
-      `;
-      row.querySelector('[data-action="edit"]').addEventListener('click', () => fillFormForEdit(doc.id, p));
-      row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteProject(doc.id));
-      adminList.appendChild(row);
+      try {
+        const p = doc.data();
+        const rawImages = Array.isArray(p.imageUrls)
+          ? p.imageUrls
+          : (typeof p.imageUrls === 'string'
+              ? p.imageUrls.split(/\r?\n/)
+              : (typeof p.imageUrl === 'string' && p.imageUrl ? [p.imageUrl] : []));
+        const images = rawImages.filter(url => typeof url === 'string' && url.trim()).map(normalizeDriveImageUrl);
+        const techStack = Array.isArray(p.techStack)
+          ? p.techStack
+          : (typeof p.techStack === 'string' ? p.techStack.split(',').map(item => item.trim()).filter(Boolean) : []);
+        const row = document.createElement('div');
+        row.className = 'admin-row';
+        row.innerHTML = `
+          <div class="thumb">${images[0] ? `<img src="${escapeAttr(images[0])}" alt="">` : ''}</div>
+          <div class="meta">
+            <h3>${escapeHtml(p.title || 'Untitled')}</h3>
+            <p>${escapeHtml(techStack.join(', '))}</p>
+          </div>
+          <div class="row-actions">
+            <button data-action="edit">Edit</button>
+            <button data-action="delete" class="danger">Delete</button>
+          </div>
+        `;
+        row.querySelector('[data-action="edit"]').addEventListener('click', () => fillFormForEdit(doc.id, p));
+        row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteProject(doc.id));
+        const thumb = row.querySelector('.thumb');
+        thumb.querySelector('img')?.addEventListener('error', () => {
+          thumb.textContent = 'Image link unavailable';
+        });
+        adminList.appendChild(row);
+      } catch (err) {
+        console.error(`Could not render project ${doc.id}:`, err);
+        const row = document.createElement('div');
+        row.className = 'admin-row';
+        row.textContent = `Project ${doc.id} could not be displayed. Check its saved fields.`;
+        adminList.appendChild(row);
+      }
     });
   }, err => {
     receivedSnapshot = true;
@@ -220,7 +236,11 @@ function fillFormForEdit(id, p) {
   pTech.value = (p.techStack || []).join(', ');
   pGithub.value = p.githubUrl || '';
   pLive.value = p.liveUrl || '';
-  const imageUrls = Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
+  const imageUrls = Array.isArray(p.imageUrls)
+    ? p.imageUrls
+    : (typeof p.imageUrls === 'string'
+        ? p.imageUrls.split(/\r?\n/).filter(Boolean)
+        : (typeof p.imageUrl === 'string' && p.imageUrl ? [p.imageUrl] : []));
   pImageUrls.value = imageUrls.join('\n');
   imageHelp.textContent = `${imageUrls.length} image URL${imageUrls.length === 1 ? '' : 's'} saved. Remove or add lines as needed.`;
   renderImagePreviews();

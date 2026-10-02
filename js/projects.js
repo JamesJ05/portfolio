@@ -121,7 +121,9 @@
     }[m]));
   }
   function getProjectImages(project){
-    const images = Array.isArray(project.imageUrls) ? project.imageUrls : [];
+    const images = Array.isArray(project.imageUrls)
+      ? project.imageUrls
+      : (typeof project.imageUrls === 'string' ? project.imageUrls.split(/\r?\n/) : []);
     return [...new Set([...images, project.imageUrl]
       .filter(url => typeof url === 'string' && url.trim())
       .map(normalizeDriveImageUrl))];
