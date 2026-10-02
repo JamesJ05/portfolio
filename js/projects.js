@@ -50,6 +50,19 @@
           </div>
         `;
 
+        const cover = card.querySelector('.project-thumb img');
+        if (cover) {
+          cover.dataset.fallback = getDriveImageFallback(images[0]);
+          cover.addEventListener('error', () => {
+            if (cover.dataset.fallback && cover.src !== cover.dataset.fallback) {
+              cover.src = cover.dataset.fallback;
+              cover.dataset.fallback = '';
+            } else {
+              cover.replaceWith(Object.assign(document.createElement('span'), { textContent: '// image unavailable' }));
+            }
+          });
+        }
+
         const openThis = () => openModal(p);
         card.addEventListener('click', openThis);
         card.addEventListener('keydown', e => {
@@ -148,6 +161,24 @@
       return previewUrl.href;
     }catch{
       return rawUrl;
+    }
+  }
+  function getDriveImageFallback(rawUrl){
+    try{
+      const url = new URL(rawUrl);
+      if (url.hostname !== 'drive.google.com' && !url.hostname.endsWith('.drive.google.com')) return '';
+      const pathParts = url.pathname.split('/');
+      const fileIndex = pathParts.indexOf('file');
+      const fileId = (fileIndex >= 0 && pathParts[fileIndex + 1] === 'd' ? pathParts[fileIndex + 2] : '') || url.searchParams.get('id');
+      if (!fileId) return '';
+      const fallback = new URL('https://drive.google.com/uc');
+      fallback.searchParams.set('export', 'view');
+      fallback.searchParams.set('id', fileId);
+      const resourceKey = url.searchParams.get('resourcekey');
+      if (resourceKey) fallback.searchParams.set('resourcekey', resourceKey);
+      return fallback.href;
+    }catch{
+      return '';
     }
   }
   function escapeAttr(str){ return escapeHtml(str); }

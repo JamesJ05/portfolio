@@ -84,13 +84,44 @@ function normalizeDriveImageUrl(rawUrl) {
 function renderImagePreviews() {
   const urls = parseProjectImageUrls(pImageUrls.value);
   const previews = urls.map((url, index) => {
+    const preview = document.createElement('div');
+    preview.className = 'image-preview';
     const img = document.createElement('img');
-    img.src = url;
     img.alt = `Project image preview ${index + 1}`;
-    img.onerror = () => img.remove();
-    return img;
+    img.dataset.fallback = getDriveImageFallback(url);
+    img.src = url;
+    img.onerror = () => {
+      if (img.dataset.fallback && img.src !== img.dataset.fallback) {
+        img.src = img.dataset.fallback;
+        img.dataset.fallback = '';
+      } else {
+        preview.textContent = `Image ${index + 1} could not load. Check the URL and sharing access.`;
+        preview.classList.add('image-preview-error');
+      }
+    };
+    preview.appendChild(img);
+    return preview;
   });
   imgPreviews.replaceChildren(...previews);
+}
+
+function getDriveImageFallback(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    if (!(url.hostname === 'drive.google.com' || url.hostname.endsWith('.drive.google.com'))) return '';
+    const pathParts = url.pathname.split('/');
+    const fileIndex = pathParts.indexOf('file');
+    const fileId = (fileIndex >= 0 && pathParts[fileIndex + 1] === 'd' ? pathParts[fileIndex + 2] : '') || url.searchParams.get('id');
+    if (!fileId) return '';
+    const fallback = new URL('https://drive.google.com/uc');
+    fallback.searchParams.set('export', 'view');
+    fallback.searchParams.set('id', fileId);
+    const resourceKey = url.searchParams.get('resourcekey');
+    if (resourceKey) fallback.searchParams.set('resourcekey', resourceKey);
+    return fallback.href;
+  } catch {
+    return '';
+  }
 }
 
 form.addEventListener('submit', async (e) => {
@@ -177,7 +208,8 @@ function loadAdminProjects() {
     const docs = [...snapshot.docs].sort((a, b) => projectCreatedAt(b.data()) - projectCreatedAt(a.data()));
     docs.forEach(doc => {
       try {
-        const p = doc.data();
+        const record = doc.data();
+        const p = record && typeof record === 'object' && !Array.isArray(record) ? record : {};
         const rawImages = Array.isArray(p.imageUrls)
           ? p.imageUrls
           : (typeof p.imageUrls === 'string'
@@ -203,15 +235,24 @@ function loadAdminProjects() {
         row.querySelector('[data-action="edit"]').addEventListener('click', () => fillFormForEdit(doc.id, p));
         row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteProject(doc.id));
         const thumb = row.querySelector('.thumb');
-        thumb.querySelector('img')?.addEventListener('error', () => {
-          thumb.textContent = 'Image link unavailable';
-        });
+        const thumbImage = thumb.querySelector('img');
+        if (thumbImage) {
+          thumbImage.dataset.fallback = getDriveImageFallback(images[0]);
+          thumbImage.addEventListener('error', () => {
+            if (thumbImage.dataset.fallback && thumbImage.src !== thumbImage.dataset.fallback) {
+              thumbImage.src = thumbImage.dataset.fallback;
+              thumbImage.dataset.fallback = '';
+            } else {
+              thumb.textContent = 'Image unavailable';
+            }
+          });
+        }
         adminList.appendChild(row);
       } catch (err) {
         console.error(`Could not render project ${doc.id}:`, err);
         const row = document.createElement('div');
         row.className = 'admin-row';
-        row.textContent = `Project ${doc.id} could not be displayed. Check its saved fields.`;
+        row.textContent = `Project ${doc.id} could not be displayed: ${err.message || 'invalid saved data'}.`;
         adminList.appendChild(row);
       }
     });
@@ -233,7 +274,7 @@ function fillFormForEdit(id, p) {
   editId.value = id;
   pTitle.value = p.title || '';
   pDescription.value = p.description || '';
-  pTech.value = (p.techStack || []).join(', ');
+  pTech.value = Array.isArray(p.techStack) ? p.techStack.join(', ') : (typeof p.techStack === 'string' ? p.techStack : '');
   pGithub.value = p.githubUrl || '';
   pLive.value = p.liveUrl || '';
   const imageUrls = Array.isArray(p.imageUrls)
@@ -552,4 +593,8 @@ function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, m => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[m]));
+}
+
+function escapeAttr(str) {
+  return escapeHtml(str);
 }
