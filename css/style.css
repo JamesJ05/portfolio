@@ -385,7 +385,7 @@ img{ max-width:100%; display:block; }
 }
 .modal-backdrop.open{ opacity:1; pointer-events:auto; }
 .modal-card{
-  position:relative; width:100%; max-width:640px; max-height:88vh; overflow-y:auto;
+  position:relative; width:100%; max-width:760px; max-height:88vh; overflow-y:auto;
   background:var(--surface); border:1px solid var(--border); border-radius:18px;
   box-shadow:0 40px 100px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(79,141,255,0.08);
   transform:translateY(24px) scale(0.97); opacity:0; transition:transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
@@ -399,13 +399,29 @@ img{ max-width:100%; display:block; }
 }
 .modal-close:hover{ color:var(--text); border-color:var(--blue-bright); transform:rotate(90deg); }
 .modal-thumb{
-  aspect-ratio:16/8; background:linear-gradient(135deg,var(--surface-2),var(--bg));
-  border-radius:18px 18px 0 0; overflow:hidden;
+  position:relative; height:clamp(210px,42vh,390px); background:linear-gradient(135deg,var(--surface-2),var(--bg));
+  border-radius:18px 18px 0 0; overflow:hidden; display:flex; align-items:center; justify-content:center;
 }
-.modal-thumb img{ width:100%; height:100%; object-fit:cover; }
-.modal-gallery{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.65rem; padding:.75rem 1.2rem 0; }
+.modal-thumb img{ display:block; width:100%; height:100%; object-fit:contain; cursor:zoom-in; }
+.modal-image-nav{ position:absolute; z-index:1; top:50%; transform:translateY(-50%); width:42px; height:42px; border:1px solid var(--border); border-radius:50%; background:rgba(6,10,22,.8); color:var(--text); font-size:1.5rem; cursor:pointer; }
+.modal-image-nav:hover,.modal-image-nav:focus-visible{ border-color:var(--blue-bright); color:var(--blue-bright); }
+.modal-image-prev{ left:.8rem; }
+.modal-image-next{ right:.8rem; }
+.modal-image-count{ position:absolute; z-index:1; bottom:.65rem; left:50%; transform:translateX(-50%); padding:.25rem .55rem; border-radius:999px; background:rgba(6,10,22,.78); color:var(--text); font: .72rem var(--font-mono); }
+.modal-gallery{ display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.65rem; padding:.75rem 1.2rem 0; }
 .modal-gallery:empty{ display:none; }
-.modal-gallery img{ display:block; width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:10px; border:1px solid var(--border); }
+.modal-gallery button{ display:block; padding:0; overflow:hidden; border:1px solid var(--border); border-radius:10px; background:var(--surface-2); cursor:pointer; }
+.modal-gallery button[aria-current="true"]{ border-color:var(--blue-bright); box-shadow:0 0 0 2px rgba(79,141,255,.25); }
+.modal-gallery img{ display:block; width:100%; aspect-ratio:4/3; object-fit:cover; }
+.image-viewer{ position:fixed; inset:0; z-index:150; display:none; align-items:center; justify-content:center; padding:4rem 5rem; background:rgba(2,4,12,.96); }
+.image-viewer.open{ display:flex; }
+.image-viewer>img{ max-width:100%; max-height:100%; object-fit:contain; }
+.image-viewer-close,.image-viewer-nav{ position:absolute; z-index:1; display:grid; place-items:center; width:46px; height:46px; border:1px solid var(--border); border-radius:50%; background:rgba(15,23,48,.9); color:var(--text); font-size:1.5rem; cursor:pointer; }
+.image-viewer-close{ top:1.25rem; right:1.25rem; }
+.image-viewer-prev{ left:1.25rem; top:50%; transform:translateY(-50%); }
+.image-viewer-next{ right:1.25rem; top:50%; transform:translateY(-50%); }
+.image-viewer-close:hover,.image-viewer-nav:hover{ border-color:var(--blue-bright); color:var(--blue-bright); }
+.image-viewer-count{ position:absolute; bottom:1rem; left:50%; transform:translateX(-50%); color:var(--text-dim); font: .8rem var(--font-mono); }
 .modal-body{ padding:1.8rem 2rem 2.2rem; }
 .modal-body h3{ font-size:1.4rem; margin-bottom:0.8rem; }
 .modal-body p{ color:var(--text-dim); line-height:1.7; margin-bottom:1.2rem; }
@@ -414,6 +430,12 @@ img{ max-width:100%; display:block; }
 
 @media (max-width:600px){
   .modal-body{ padding:1.4rem 1.4rem 1.8rem; }
+  .modal-backdrop{ padding:.6rem; }
+  .modal-card{ max-height:94vh; }
+  .modal-thumb{ height:32vh; min-height:180px; }
+  .modal-gallery{ grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:.45rem; padding:.6rem .8rem 0; }
+  .image-viewer{ padding:4rem 3.5rem; }
+  .image-viewer-close,.image-viewer-nav{ width:40px; height:40px; }
 }
 
 /* contact */
