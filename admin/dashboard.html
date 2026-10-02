@@ -108,7 +108,7 @@
     <div class="dash-grid">
       <div class="panel">
         <h2 id="formTitle">Add a project</h2>
-        <form id="projectForm" class="dash-form">
+        <form id="projectForm" class="dash-form" novalidate>
           <input type="hidden" id="editId" value="" />
           <label>Title <input type="text" id="pTitle" required placeholder="MotoStock — Warehouse Inventory System" /></label>
           <label>Description <textarea id="pDescription" rows="4" required placeholder="What it does, the stack, and why it matters."></textarea></label>
@@ -121,9 +121,9 @@
           </label>
           <p class="form-hint" id="imageHelp">For Google Drive, set General access to “Anyone with the link”. First URL is the cover image.</p>
           <div id="imgPreviews" aria-live="polite"></div>
+          <p class="form-status" id="dashStatus" role="status" aria-live="polite"></p>
           <button type="submit" class="btn btn-primary btn-block" id="saveBtn">Save project</button>
           <button type="button" class="btn btn-ghost btn-block" id="cancelEditBtn" hidden>Cancel edit</button>
-          <p class="form-status" id="dashStatus"></p>
         </form>
       </div>
       <div class="panel">

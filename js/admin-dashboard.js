@@ -100,6 +100,14 @@ form.addEventListener('submit', async (e) => {
   setStatus(dashStatus, '');
 
   try {
+    if (!pTitle.value.trim()) {
+      pTitle.focus();
+      throw new Error('Enter a project title. Placeholder text does not count.');
+    }
+    if (!pDescription.value.trim()) {
+      pDescription.focus();
+      throw new Error('Enter a project description. Placeholder text does not count.');
+    }
     const imageUrls = parseProjectImageUrls(pImageUrls.value);
     if (imageUrls.some(url => !/^https?:\/\//i.test(url))) {
       throw new Error('Each project image must be a valid http or https URL.');
@@ -169,15 +177,18 @@ function loadAdminProjects() {
     const docs = [...snapshot.docs].sort((a, b) => projectCreatedAt(b.data()) - projectCreatedAt(a.data()));
     docs.forEach(doc => {
       const p = doc.data();
-      const images = (Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []))
-        .map(normalizeDriveImageUrl);
+      const rawImages = Array.isArray(p.imageUrls) ? p.imageUrls : (typeof p.imageUrl === 'string' && p.imageUrl ? [p.imageUrl] : []);
+      const images = rawImages.filter(url => typeof url === 'string' && url.trim()).map(normalizeDriveImageUrl);
+      const techStack = Array.isArray(p.techStack)
+        ? p.techStack
+        : (typeof p.techStack === 'string' ? p.techStack.split(',').map(item => item.trim()).filter(Boolean) : []);
       const row = document.createElement('div');
       row.className = 'admin-row';
       row.innerHTML = `
         <div class="thumb">${images[0] ? `<img src="${escapeAttr(images[0])}" alt="">` : ''}</div>
         <div class="meta">
           <h3>${escapeHtml(p.title || 'Untitled')}</h3>
-          <p>${escapeHtml((p.techStack || []).join(', '))}</p>
+          <p>${escapeHtml(techStack.join(', '))}</p>
         </div>
         <div class="row-actions">
           <button data-action="edit">Edit</button>
