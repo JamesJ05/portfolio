@@ -56,18 +56,27 @@ const pGithub = document.getElementById('pGithub');
 const pLive = document.getElementById('pLive');
 const pImages = document.getElementById('pImages');
 const imageHelp = document.getElementById('imageHelp');
+let existingProjectImages = [];
 
 pImages.addEventListener('change', renderImagePreviews);
 
 function renderImagePreviews() {
   const selectedFiles = [...pImages.files];
-  imgPreviews.replaceChildren(...selectedFiles.map((file, index) => {
+  const savedPreviews = existingProjectImages.map((url, index) => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = `Saved project photo ${index + 1}`;
+    img.onerror = () => img.remove();
+    return img;
+  });
+  const newPreviews = selectedFiles.map((file, index) => {
     const img = document.createElement('img');
     img.src = URL.createObjectURL(file);
     img.alt = `Selected project photo ${index + 1}`;
     img.onload = () => URL.revokeObjectURL(img.src);
     return img;
-  }));
+  });
+  imgPreviews.replaceChildren(...savedPreviews, ...newPreviews);
 }
 
 async function uploadProjectImages(files, projectId) {
@@ -119,7 +128,11 @@ form.addEventListener('submit', async (e) => {
     }
 
     const wasEditing = Boolean(editId.value);
-    resetProjectForm();
+    if (!wasEditing) {
+      editId.value = projectId;
+      formTitle.textContent = 'Edit project';
+      cancelEditBtn.hidden = false;
+    }
     loadAdminProjects();
 
     try {
@@ -131,11 +144,13 @@ form.addEventListener('submit', async (e) => {
           imageUrl: savedImages[0] || '',
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        existingProjectImages = savedImages;
       }
       setStatus(dashStatus, wasEditing ? 'Project updated.' : 'Project added.', false);
+      resetProjectForm();
     } catch (uploadError) {
       console.error('Project was saved, but photo upload failed:', uploadError);
-      setStatus(dashStatus, `Project saved, but photo upload failed: ${uploadError.message}. Edit the project to retry.`, true);
+      setStatus(dashStatus, `Project details are saved, but photo upload failed: ${uploadError.message}. Your photos are still selected; fix Storage setup and save again.`, true);
     }
 
     loadAdminProjects();
@@ -154,6 +169,7 @@ function resetProjectForm() {
   form.reset();
   editId.value = '';
   pImages.value = '';
+  existingProjectImages = [];
   imgPreviews.replaceChildren();
   imageHelp.textContent = 'Choose one or more photos. The first photo is the project cover.';
   formTitle.textContent = 'Add a project';
@@ -161,7 +177,7 @@ function resetProjectForm() {
 }
 
 function loadAdminProjects() {
-  db.collection('projects').orderBy('createdAt', 'desc').get()
+  getDashboardSnapshot(db.collection('projects').orderBy('createdAt', 'desc'), 'Projects')
     .then(snapshot => {
       adminList.innerHTML = '';
       if (snapshot.empty) {
@@ -191,7 +207,7 @@ function loadAdminProjects() {
     })
     .catch(err => {
       console.error(err);
-      adminList.innerHTML = '<p class="projects-empty">Could not load projects.</p>';
+      adminList.innerHTML = `<p class="projects-empty">${escapeHtml(err.message || 'Could not load projects.')}</p>`;
     });
 }
 
@@ -203,6 +219,7 @@ function fillFormForEdit(id, p) {
   pGithub.value = p.githubUrl || '';
   pLive.value = p.liveUrl || '';
   const imageUrls = Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
+  existingProjectImages = imageUrls;
   pImages.value = '';
   imageHelp.textContent = `${imageUrls.length} existing photo${imageUrls.length === 1 ? '' : 's'} saved. Choose more to add to this project.`;
   renderImagePreviews();
@@ -312,7 +329,7 @@ function resetSkillForm() {
 }
 
 function loadSkillCategories() {
-  db.collection('skillCategories').orderBy('order', 'asc').get()
+  getDashboardSnapshot(db.collection('skillCategories').orderBy('order', 'asc'), 'Skills')
     .then(snapshot => {
       skillList.innerHTML = '';
       if (snapshot.empty) {
@@ -339,7 +356,7 @@ function loadSkillCategories() {
       });
     })
     .catch(err => {
-      skillList.innerHTML = '<p class="projects-empty">Could not load skills.</p>';
+      skillList.innerHTML = `<p class="projects-empty">${escapeHtml(err.message || 'Could not load skills.')}</p>`;
       console.error(err);
     });
 }
@@ -448,7 +465,7 @@ function resetCertForm() {
 }
 
 function loadCertifications() {
-  db.collection('certifications').orderBy('order', 'asc').get()
+  getDashboardSnapshot(db.collection('certifications').orderBy('order', 'asc'), 'Certifications')
     .then(snapshot => {
       certList.innerHTML = '';
       if (snapshot.empty) {
@@ -475,7 +492,7 @@ function loadCertifications() {
       });
     })
     .catch(err => {
-      certList.innerHTML = '<p class="projects-empty">Could not load certifications.</p>';
+      certList.innerHTML = `<p class="projects-empty">${escapeHtml(err.message || 'Could not load certifications.')}</p>`;
       console.error(err);
     });
 }
@@ -496,6 +513,15 @@ function deleteCert(id) {
 }
 
 /* ---------- Helpers ---------- */
+function getDashboardSnapshot(query, label) {
+  const timeout = new Promise((_, reject) => {
+    window.setTimeout(() => reject(new Error(
+      `${label} are taking too long to load. Check your internet connection, Firestore status, and security rules, then reload.`
+    )), 12000);
+  });
+  return Promise.race([query.get(), timeout]);
+}
+
 function setStatus(el, msg, isError) {
   el.textContent = msg;
   el.className = 'form-status ' + (isError ? 'err' : isError === false ? 'ok' : '');

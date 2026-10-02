@@ -9,9 +9,14 @@
   const loading = document.getElementById('projectsLoading');
   if (!grid) return;
 
+  const initialLoadTimeout = window.setTimeout(() => {
+    if (loading?.isConnected) loading.textContent = 'Projects are taking too long to load. Check your connection and reload.';
+  }, 12000);
+
   db.collection('projects')
     .orderBy('createdAt', 'desc')
     .onSnapshot(snapshot => {
+      window.clearTimeout(initialLoadTimeout);
       loading?.remove();
       grid.replaceChildren();
 
@@ -54,8 +59,9 @@
         grid.appendChild(card);
       });
     }, err => {
+      window.clearTimeout(initialLoadTimeout);
       console.error('Failed to load projects:', err);
-      if (loading) loading.textContent = 'Could not load projects right now.';
+      if (loading) loading.textContent = `Could not load projects: ${err.message || 'database request failed.'}`;
     });
 
   /* ---------- Modal ---------- */
