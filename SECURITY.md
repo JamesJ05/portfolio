@@ -16,7 +16,7 @@ npx firebase-tools deploy --only firestore:rules
 
 User email addresses are private: clients can sign in only with email and password. Usernames are stored only as private, immutable reservations so they cannot be enumerated or used as an email directory.
 
-Images are static repository files in `assets/images/`; Firebase Storage is not configured, so no billing account is needed for uploads.
+Project photos are referenced by public image URLs stored in Firestore. Google Drive links need to be shared as “Anyone with the link” so site visitors can view them. Firebase Storage is not configured or required for this workflow.
 
 ## Immediate follow-up
 

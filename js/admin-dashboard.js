@@ -54,60 +54,55 @@ const pDescription = document.getElementById('pDescription');
 const pTech = document.getElementById('pTech');
 const pGithub = document.getElementById('pGithub');
 const pLive = document.getElementById('pLive');
-const pImages = document.getElementById('pImages');
+const pImageUrls = document.getElementById('pImageUrls');
 const imageHelp = document.getElementById('imageHelp');
-let existingProjectImages = [];
 
-pImages.addEventListener('change', renderImagePreviews);
+pImageUrls.addEventListener('input', renderImagePreviews);
+
+function parseProjectImageUrls(value) {
+  return [...new Set(value.split(/\r?\n/).map(url => url.trim()).filter(Boolean).map(normalizeDriveImageUrl))];
+}
+
+function normalizeDriveImageUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    if (!/(^|\.)drive\.google\.com$/i.test(url.hostname)) return url.href;
+
+    const fileId = url.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || url.searchParams.get('id');
+    if (!fileId) return url.href;
+    const previewUrl = new URL('https://drive.google.com/thumbnail');
+    previewUrl.searchParams.set('id', fileId);
+    previewUrl.searchParams.set('sz', 'w1600');
+    const resourceKey = url.searchParams.get('resourcekey');
+    if (resourceKey) previewUrl.searchParams.set('resourcekey', resourceKey);
+    return previewUrl.href;
+  } catch {
+    return rawUrl;
+  }
+}
 
 function renderImagePreviews() {
-  const selectedFiles = [...pImages.files];
-  const savedPreviews = existingProjectImages.map((url, index) => {
+  const urls = parseProjectImageUrls(pImageUrls.value);
+  const previews = urls.map((url, index) => {
     const img = document.createElement('img');
     img.src = url;
-    img.alt = `Saved project photo ${index + 1}`;
+    img.alt = `Project image preview ${index + 1}`;
     img.onerror = () => img.remove();
     return img;
   });
-  const newPreviews = selectedFiles.map((file, index) => {
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
-    img.alt = `Selected project photo ${index + 1}`;
-    img.onload = () => URL.revokeObjectURL(img.src);
-    return img;
-  });
-  imgPreviews.replaceChildren(...savedPreviews, ...newPreviews);
-}
-
-async function uploadProjectImages(files, projectId) {
-  const uploadedUrls = [];
-  for (const file of files) {
-    if (!file.type.startsWith('image/')) throw new Error(`${file.name} is not an image.`);
-    if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} is larger than the 10 MB limit.`);
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const imageRef = storage.ref(`projects/${projectId}/${Date.now()}-${safeName}`);
-    const snapshot = await imageRef.put(file, { contentType: file.type });
-    uploadedUrls.push(await snapshot.ref.getDownloadURL());
-  }
-  return uploadedUrls;
+  imgPreviews.replaceChildren(...previews);
 }
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   saveBtn.disabled = true;
-  saveBtn.textContent = pImages.files.length ? 'Uploading photos…' : 'Saving…';
+  saveBtn.textContent = 'Saving project...';
   setStatus(dashStatus, '');
 
   try {
-    const projectId = editId.value || db.collection('projects').doc().id;
-    const imageFiles = [...pImages.files];
-    let previousImages = [];
-    if (editId.value) {
-      const existingProject = await db.collection('projects').doc(projectId).get();
-      const existingData = existingProject.data() || {};
-      previousImages = Array.isArray(existingData.imageUrls)
-        ? existingData.imageUrls
-        : (existingData.imageUrl ? [existingData.imageUrl] : []);
+    const imageUrls = parseProjectImageUrls(pImageUrls.value);
+    if (imageUrls.some(url => !/^https?:\/\//i.test(url))) {
+      throw new Error('Each project image must be a valid http or https URL.');
     }
     const data = {
       title: pTitle.value.trim(),
@@ -115,44 +110,21 @@ form.addEventListener('submit', async (e) => {
       techStack: pTech.value.split(',').map(t => t.trim()).filter(Boolean),
       githubUrl: pGithub.value.trim(),
       liveUrl: pLive.value.trim(),
-      imageUrls: previousImages,
-      imageUrl: previousImages[0] || '',
+      imageUrls,
+      imageUrl: imageUrls[0] || '',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     if (editId.value) {
-      await db.collection('projects').doc(projectId).update(data);
+      await db.collection('projects').doc(editId.value).update(data);
+      setStatus(dashStatus, 'Project updated.', false);
     } else {
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      await db.collection('projects').doc(projectId).set(data);
+      await db.collection('projects').add(data);
+      setStatus(dashStatus, 'Project added.', false);
     }
 
-    const wasEditing = Boolean(editId.value);
-    if (!wasEditing) {
-      editId.value = projectId;
-      formTitle.textContent = 'Edit project';
-      cancelEditBtn.hidden = false;
-    }
-    loadAdminProjects();
-
-    try {
-      const newImageUrls = await uploadProjectImages(imageFiles, projectId);
-      if (newImageUrls.length) {
-        const savedImages = [...previousImages, ...newImageUrls];
-        await db.collection('projects').doc(projectId).update({
-          imageUrls: savedImages,
-          imageUrl: savedImages[0] || '',
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        existingProjectImages = savedImages;
-      }
-      setStatus(dashStatus, wasEditing ? 'Project updated.' : 'Project added.', false);
-      resetProjectForm();
-    } catch (uploadError) {
-      console.error('Project was saved, but photo upload failed:', uploadError);
-      setStatus(dashStatus, `Project details are saved, but photo upload failed: ${uploadError.message}. Your photos are still selected; fix Storage setup and save again.`, true);
-    }
-
+    resetProjectForm();
     loadAdminProjects();
   } catch (err) {
     console.error(err);
@@ -162,16 +134,14 @@ form.addEventListener('submit', async (e) => {
     saveBtn.textContent = 'Save project';
   }
 });
-
 cancelEditBtn.addEventListener('click', resetProjectForm);
 
 function resetProjectForm() {
   form.reset();
   editId.value = '';
-  pImages.value = '';
-  existingProjectImages = [];
+  pImageUrls.value = '';
   imgPreviews.replaceChildren();
-  imageHelp.textContent = 'Choose one or more photos. The first photo is the project cover.';
+  imageHelp.textContent = 'For Google Drive, set General access to “Anyone with the link”. First URL is the cover image.';
   formTitle.textContent = 'Add a project';
   cancelEditBtn.hidden = true;
 }
@@ -186,7 +156,8 @@ function loadAdminProjects() {
       }
       snapshot.forEach(doc => {
         const p = doc.data();
-        const images = Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
+        const images = (Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []))
+          .map(normalizeDriveImageUrl);
         const row = document.createElement('div');
         row.className = 'admin-row';
         row.innerHTML = `
@@ -219,9 +190,8 @@ function fillFormForEdit(id, p) {
   pGithub.value = p.githubUrl || '';
   pLive.value = p.liveUrl || '';
   const imageUrls = Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
-  existingProjectImages = imageUrls;
-  pImages.value = '';
-  imageHelp.textContent = `${imageUrls.length} existing photo${imageUrls.length === 1 ? '' : 's'} saved. Choose more to add to this project.`;
+  pImageUrls.value = imageUrls.join('\n');
+  imageHelp.textContent = `${imageUrls.length} image URL${imageUrls.length === 1 ? '' : 's'} saved. Remove or add lines as needed.`;
   renderImagePreviews();
   formTitle.textContent = 'Edit project';
   cancelEditBtn.hidden = false;

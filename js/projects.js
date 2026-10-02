@@ -122,7 +122,25 @@
   }
   function getProjectImages(project){
     const images = Array.isArray(project.imageUrls) ? project.imageUrls : [];
-    return [...new Set([...images, project.imageUrl].filter(url => typeof url === 'string' && url.trim()))];
+    return [...new Set([...images, project.imageUrl]
+      .filter(url => typeof url === 'string' && url.trim())
+      .map(normalizeDriveImageUrl))];
+  }
+  function normalizeDriveImageUrl(rawUrl){
+    try{
+      const url = new URL(rawUrl);
+      if (!/(^|\.)drive\.google\.com$/i.test(url.hostname)) return url.href;
+      const fileId = url.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || url.searchParams.get('id');
+      if (!fileId) return url.href;
+      const previewUrl = new URL('https://drive.google.com/thumbnail');
+      previewUrl.searchParams.set('id', fileId);
+      previewUrl.searchParams.set('sz', 'w1600');
+      const resourceKey = url.searchParams.get('resourcekey');
+      if (resourceKey) previewUrl.searchParams.set('resourcekey', resourceKey);
+      return previewUrl.href;
+    }catch{
+      return rawUrl;
+    }
   }
   function escapeAttr(str){ return escapeHtml(str); }
 })();
