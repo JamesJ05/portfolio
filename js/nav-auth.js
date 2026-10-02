@@ -44,8 +44,8 @@
         () => renderSignedInNav(user, {}, admin)
       );
     } else {
-      setBrandLabel(navUsername, 'Aspiring IT Professional');
-      setBrandLabel(footerUsername, 'Guest');
+      setBrandLabel(navUsername, 'Portfolio');
+      setBrandLabel(footerUsername, 'Portfolio');
       authNav.innerHTML = `
         <a href="https://jamesj05.github.io/portfolio/login.html" class="btn btn-ghost nav-btn">Log in</a>
         <a href="https://jamesj05.github.io/portfolio/register.html" class="btn btn-primary nav-btn">Sign up</a>
