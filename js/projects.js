@@ -33,13 +33,14 @@
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `View details for ${p.title || 'this project'}`);
 
+        const images = getProjectImages(p);
         const tags = Array.isArray(p.techStack)
           ? p.techStack.map(t => `<span>${escapeHtml(t)}</span>`).join('')
           : '';
 
         card.innerHTML = `
           <div class="project-thumb">
-            ${p.imageUrl ? `<img src="${escapeAttr(p.imageUrl)}" alt="${escapeAttr(p.title || 'Project screenshot')}" loading="lazy">` : '<span>// no preview</span>'}
+            ${images[0] ? `<img src="${escapeAttr(images[0])}" alt="${escapeAttr(p.title || 'Project screenshot')}" loading="lazy">` : '<span>// no preview</span>'}
           </div>
           <div class="project-body">
             <h3>${escapeHtml(p.title || 'Untitled project')}</h3>
@@ -65,6 +66,7 @@
   /* ---------- Modal ---------- */
   const backdrop = document.getElementById('projectModalBackdrop');
   const modalThumb = document.getElementById('modalThumb');
+  const modalGallery = document.getElementById('modalGallery');
   const modalTitle = document.getElementById('modalTitle');
   const modalDescription = document.getElementById('modalDescription');
   const modalTags = document.getElementById('modalTags');
@@ -72,9 +74,13 @@
   const modalClose = document.getElementById('modalClose');
 
   function openModal(p){
-    modalThumb.innerHTML = p.imageUrl
-      ? `<img src="${escapeAttr(p.imageUrl)}" alt="${escapeAttr(p.title || '')}">`
+    const images = getProjectImages(p);
+    modalThumb.innerHTML = images[0]
+      ? `<img src="${escapeAttr(images[0])}" alt="${escapeAttr(p.title || '')}">`
       : '';
+    modalGallery.innerHTML = images.slice(1).map((url, index) =>
+      `<img src="${escapeAttr(url)}" alt="${escapeAttr(p.title || 'Project')} image ${index + 2}" loading="lazy">`
+    ).join('');
     modalTitle.textContent = p.title || 'Untitled project';
     modalDescription.textContent = p.description || '';
     modalTags.innerHTML = Array.isArray(p.techStack)
@@ -112,6 +118,10 @@
     return String(str).replace(/[&<>"']/g, m => ({
       '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
     }[m]));
+  }
+  function getProjectImages(project){
+    const images = Array.isArray(project.imageUrls) ? project.imageUrls : [];
+    return [...new Set([...images, project.imageUrl].filter(url => typeof url === 'string' && url.trim()))];
   }
   function escapeAttr(str){ return escapeHtml(str); }
 })();

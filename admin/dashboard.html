@@ -43,7 +43,8 @@
   }
   .dash-form input:focus, .dash-form textarea:focus{ outline:none; border-color:var(--blue-bright); background:#172348; box-shadow:0 0 0 3px rgba(79,141,255,.12); }
   .dash-form textarea{ resize:vertical; }
-  #imgPreview{ margin-top:0.5rem; max-height:140px; border-radius:8px; display:none; border:1px solid var(--border); }
+  #imgPreviews{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.5rem; }
+  #imgPreviews img{ width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; border:1px solid var(--border); }
 
   .admin-list{ display:flex; flex-direction:column; gap:0.9rem; }
   .admin-row{
@@ -115,11 +116,11 @@
           <label>GitHub URL <input type="url" id="pGithub" placeholder="https://github.com/you/repo" /></label>
           <label>Live demo URL <input type="url" id="pLive" placeholder="https://..." /></label>
           <label>
-            Project image path
-            <input type="text" id="pImageUrl" placeholder="../assets/images/project-name.jpg" />
+            Project photos
+            <input type="file" id="pImages" accept="image/*" multiple />
           </label>
-          <p class="password-hint">Add project images to <code>assets/images/</code> in the repository, then paste the path above.</p>
-          <img id="imgPreview" alt="Preview" />
+          <p class="form-hint" id="imageHelp">Choose one or more photos. The first photo is the project cover.</p>
+          <div id="imgPreviews" aria-live="polite"></div>
           <button type="submit" class="btn btn-primary btn-block" id="saveBtn">Save project</button>
           <button type="button" class="btn btn-ghost btn-block" id="cancelEditBtn" hidden>Cancel edit</button>
           <p class="form-status" id="dashStatus"></p>
@@ -192,6 +193,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="../js/firebase-config.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/auth-utils.js"></script>

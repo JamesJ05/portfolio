@@ -45,7 +45,7 @@ const dashStatus = document.getElementById('dashStatus');
 const saveBtn = document.getElementById('saveBtn');
 const cancelEditBtn = document.getElementById('cancelEditBtn');
 const formTitle = document.getElementById('formTitle');
-const imgPreview = document.getElementById('imgPreview');
+const imgPreviews = document.getElementById('imgPreviews');
 const adminList = document.getElementById('adminList');
 
 const editId = document.getElementById('editId');
@@ -54,24 +54,53 @@ const pDescription = document.getElementById('pDescription');
 const pTech = document.getElementById('pTech');
 const pGithub = document.getElementById('pGithub');
 const pLive = document.getElementById('pLive');
-const pImageUrl = document.getElementById('pImageUrl');
+const pImages = document.getElementById('pImages');
+const imageHelp = document.getElementById('imageHelp');
 
-let currentImageUrl = '';
+pImages.addEventListener('change', renderImagePreviews);
 
-pImageUrl.addEventListener('input', () => {
-  const imageUrl = pImageUrl.value.trim();
-  imgPreview.src = imageUrl;
-  imgPreview.style.display = imageUrl ? 'block' : 'none';
-});
+function renderImagePreviews() {
+  const selectedFiles = [...pImages.files];
+  imgPreviews.replaceChildren(...selectedFiles.map((file, index) => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.alt = `Selected project photo ${index + 1}`;
+    img.onload = () => URL.revokeObjectURL(img.src);
+    return img;
+  }));
+}
+
+async function uploadProjectImages(files, projectId) {
+  const uploadedUrls = [];
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) throw new Error(`${file.name} is not an image.`);
+    if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} is larger than the 10 MB limit.`);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const imageRef = storage.ref(`projects/${projectId}/${Date.now()}-${safeName}`);
+    const snapshot = await imageRef.put(file, { contentType: file.type });
+    uploadedUrls.push(await snapshot.ref.getDownloadURL());
+  }
+  return uploadedUrls;
+}
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving…';
+  saveBtn.textContent = pImages.files.length ? 'Uploading photos…' : 'Saving…';
   setStatus(dashStatus, '');
 
   try {
-    const imageUrl = pImageUrl.value.trim() || currentImageUrl;
+    const projectId = editId.value || db.collection('projects').doc().id;
+    const newImageUrls = await uploadProjectImages([...pImages.files], projectId);
+    let previousImages = [];
+    if (editId.value) {
+      const existingProject = await db.collection('projects').doc(projectId).get();
+      const existingData = existingProject.data() || {};
+      previousImages = Array.isArray(existingData.imageUrls)
+        ? existingData.imageUrls
+        : (existingData.imageUrl ? [existingData.imageUrl] : []);
+    }
+    const savedImages = [...previousImages, ...newImageUrls];
 
     const data = {
       title: pTitle.value.trim(),
@@ -79,16 +108,17 @@ form.addEventListener('submit', async (e) => {
       techStack: pTech.value.split(',').map(t => t.trim()).filter(Boolean),
       githubUrl: pGithub.value.trim(),
       liveUrl: pLive.value.trim(),
-      imageUrl: imageUrl || '',
+      imageUrls: savedImages,
+      imageUrl: savedImages[0] || '',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     if (editId.value) {
-      await db.collection('projects').doc(editId.value).update(data);
+      await db.collection('projects').doc(projectId).update(data);
       setStatus(dashStatus, 'Project updated.', false);
     } else {
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      await db.collection('projects').add(data);
+      await db.collection('projects').doc(projectId).set(data);
       setStatus(dashStatus, 'Project added.', false);
     }
 
@@ -108,9 +138,9 @@ cancelEditBtn.addEventListener('click', resetProjectForm);
 function resetProjectForm() {
   form.reset();
   editId.value = '';
-  currentImageUrl = '';
-  pImageUrl.value = '';
-  imgPreview.style.display = 'none';
+  pImages.value = '';
+  imgPreviews.replaceChildren();
+  imageHelp.textContent = 'Choose one or more photos. The first photo is the project cover.';
   formTitle.textContent = 'Add a project';
   cancelEditBtn.hidden = true;
 }
@@ -125,10 +155,11 @@ function loadAdminProjects() {
       }
       snapshot.forEach(doc => {
         const p = doc.data();
+        const images = Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
         const row = document.createElement('div');
         row.className = 'admin-row';
         row.innerHTML = `
-          <div class="thumb">${p.imageUrl ? `<img src="${p.imageUrl}" alt="">` : ''}</div>
+          <div class="thumb">${images[0] ? `<img src="${escapeAttr(images[0])}" alt="">` : ''}</div>
           <div class="meta">
             <h3>${escapeHtml(p.title || 'Untitled')}</h3>
             <p>${escapeHtml((p.techStack || []).join(', '))}</p>
@@ -156,14 +187,10 @@ function fillFormForEdit(id, p) {
   pTech.value = (p.techStack || []).join(', ');
   pGithub.value = p.githubUrl || '';
   pLive.value = p.liveUrl || '';
-  currentImageUrl = p.imageUrl || '';
-  pImageUrl.value = currentImageUrl;
-  if (currentImageUrl) {
-    imgPreview.src = currentImageUrl;
-    imgPreview.style.display = 'block';
-  } else {
-    imgPreview.style.display = 'none';
-  }
+  const imageUrls = Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
+  pImages.value = '';
+  imageHelp.textContent = `${imageUrls.length} existing photo${imageUrls.length === 1 ? '' : 's'} saved. Choose more to add to this project.`;
+  renderImagePreviews();
   formTitle.textContent = 'Edit project';
   cancelEditBtn.hidden = false;
   document.querySelector('[data-panel="projects"]').click();
