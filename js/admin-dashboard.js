@@ -120,7 +120,8 @@ form.addEventListener('submit', async (e) => {
       setStatus(dashStatus, 'Project updated.', false);
     } else {
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      await db.collection('projects').add(data);
+      const createdProject = await db.collection('projects').add(data);
+      setStatus(dashStatus, `Project added successfully (${createdProject.id}).`, false);
       setStatus(dashStatus, 'Project added.', false);
     }
 
@@ -146,40 +147,59 @@ function resetProjectForm() {
   cancelEditBtn.hidden = true;
 }
 
+let adminProjectsUnsubscribe;
+
 function loadAdminProjects() {
-  getDashboardSnapshot(db.collection('projects').orderBy('createdAt', 'desc'), 'Projects')
-    .then(snapshot => {
-      adminList.innerHTML = '';
-      if (snapshot.empty) {
-        adminList.innerHTML = '<p class="projects-empty">No projects yet — add your first one.</p>';
-        return;
-      }
-      snapshot.forEach(doc => {
-        const p = doc.data();
-        const images = (Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []))
-          .map(normalizeDriveImageUrl);
-        const row = document.createElement('div');
-        row.className = 'admin-row';
-        row.innerHTML = `
-          <div class="thumb">${images[0] ? `<img src="${escapeAttr(images[0])}" alt="">` : ''}</div>
-          <div class="meta">
-            <h3>${escapeHtml(p.title || 'Untitled')}</h3>
-            <p>${escapeHtml((p.techStack || []).join(', '))}</p>
-          </div>
-          <div class="row-actions">
-            <button data-action="edit">Edit</button>
-            <button data-action="delete" class="danger">Delete</button>
-          </div>
-        `;
-        row.querySelector('[data-action="edit"]').addEventListener('click', () => fillFormForEdit(doc.id, p));
-        row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteProject(doc.id));
-        adminList.appendChild(row);
-      });
-    })
-    .catch(err => {
-      console.error(err);
-      adminList.innerHTML = `<p class="projects-empty">${escapeHtml(err.message || 'Could not load projects.')}</p>`;
+  adminProjectsUnsubscribe?.();
+  let receivedSnapshot = false;
+  const timeoutId = window.setTimeout(() => {
+    if (!receivedSnapshot) {
+      adminList.innerHTML = 'Projects are taking too long to load. Check your connection and Firestore rules, then reload.';
+    }
+  }, 12000);
+
+  adminProjectsUnsubscribe = db.collection('projects').onSnapshot(snapshot => {
+    receivedSnapshot = true;
+    window.clearTimeout(timeoutId);
+    adminList.replaceChildren();
+    if (snapshot.empty) {
+      adminList.innerHTML = '<p class="projects-empty">No projects yet. Add your first one.</p>';
+      return;
+    }
+    const docs = [...snapshot.docs].sort((a, b) => projectCreatedAt(b.data()) - projectCreatedAt(a.data()));
+    docs.forEach(doc => {
+      const p = doc.data();
+      const images = (Array.isArray(p.imageUrls) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []))
+        .map(normalizeDriveImageUrl);
+      const row = document.createElement('div');
+      row.className = 'admin-row';
+      row.innerHTML = `
+        <div class="thumb">${images[0] ? `<img src="${escapeAttr(images[0])}" alt="">` : ''}</div>
+        <div class="meta">
+          <h3>${escapeHtml(p.title || 'Untitled')}</h3>
+          <p>${escapeHtml((p.techStack || []).join(', '))}</p>
+        </div>
+        <div class="row-actions">
+          <button data-action="edit">Edit</button>
+          <button data-action="delete" class="danger">Delete</button>
+        </div>
+      `;
+      row.querySelector('[data-action="edit"]').addEventListener('click', () => fillFormForEdit(doc.id, p));
+      row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteProject(doc.id));
+      adminList.appendChild(row);
     });
+  }, err => {
+    receivedSnapshot = true;
+    window.clearTimeout(timeoutId);
+    console.error(err);
+    adminList.innerHTML = `<p class="projects-empty">${escapeHtml(err.message || 'Could not load projects.')}</p>`;
+  });
+}
+function projectCreatedAt(project) {
+  const value = project.createdAt;
+  if (value && typeof value.toMillis === 'function') return value.toMillis();
+  const parsed = value ? Date.parse(value) : 0;
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function fillFormForEdit(id, p) {

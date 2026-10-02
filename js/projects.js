@@ -14,7 +14,6 @@
   }, 12000);
 
   db.collection('projects')
-    .orderBy('createdAt', 'desc')
     .onSnapshot(snapshot => {
       window.clearTimeout(initialLoadTimeout);
       loading?.remove();
@@ -25,7 +24,8 @@
         return;
       }
 
-      snapshot.forEach((doc, index) => {
+      const docs = [...snapshot.docs].sort((a, b) => projectCreatedAt(b.data()) - projectCreatedAt(a.data()));
+      docs.forEach((doc, index) => {
         const p = doc.data();
         const card = document.createElement('article');
         card.className = 'project-card';
@@ -125,6 +125,12 @@
     return [...new Set([...images, project.imageUrl]
       .filter(url => typeof url === 'string' && url.trim())
       .map(normalizeDriveImageUrl))];
+  }
+  function projectCreatedAt(project){
+    const value = project.createdAt;
+    if (value && typeof value.toMillis === 'function') return value.toMillis();
+    const parsed = value ? Date.parse(value) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
   }
   function normalizeDriveImageUrl(rawUrl){
     try{
