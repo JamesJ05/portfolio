@@ -117,8 +117,6 @@ img{ max-width:100%; display:block; }
 .nav-links a:hover::after{ width:100%; }
 .nav-actions{ display:flex; align-items:center; gap:0.75rem; }
 .auth-nav{ display:flex; align-items:center; gap:0.55rem; }
-.nav-login{ color:var(--text-faint); font:500 .73rem var(--font-mono); letter-spacing:.04em; padding:.5rem .65rem; border:1px solid transparent; border-radius:8px; transition:color .2s,border-color .2s,background .2s; }
-.nav-login:hover{ color:var(--cyan); border-color:var(--border); background:rgba(79,141,255,.06); }
 .nav-btn{ padding:0.45rem 0.85rem !important; font-size:0.78rem !important; }
 .nav-admin{
   font-family:var(--font-mono); font-size:0.78rem; color:var(--text-faint);
@@ -514,7 +512,6 @@ img{ max-width:100%; display:block; }
   .nav-burger{ display:flex; }
   .nav-actions{ gap:0.25rem; }
   .nav-admin{ display:none; }
-  .nav-login{ font-size:.68rem; padding:.42rem .5rem; }
   .nav-profile{ width:34px; height:34px; }
   .about-grid{ grid-template-columns:1fr; }
   .photo-frame{ max-width:220px; }

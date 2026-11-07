@@ -46,7 +46,10 @@
     } else {
       setBrandLabel(navUsername, 'Portfolio');
       setBrandLabel(footerUsername, 'Portfolio');
-      authNav.innerHTML = '<a href="login.html" class="nav-login">Admin login</a>';
+      authNav.innerHTML = `
+        <a href="login.html" class="btn btn-ghost nav-btn">Log in</a>
+        <a href="register.html" class="btn btn-primary nav-btn">Sign up</a>
+      `;
     }
   });
 })();
