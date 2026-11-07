@@ -1,7 +1,7 @@
 ﻿(function loadPosts() {
   const grid = document.getElementById('postsGrid');
   const loading = document.getElementById('postsLoading');
-  if (!grid || !window.db) return;
+  if (!grid || typeof db === 'undefined') return;
 
   const timeout = window.setTimeout(() => {
     if (loading?.isConnected) loading.textContent = 'Updates are taking too long to load. Please try again later.';
