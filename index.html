@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css?v=20261107-4" />
+<link rel="stylesheet" href="css/style.css?v=20261107-5" />
 <link rel="stylesheet" href="css/animations.css" />
 </head>
 <body>
@@ -120,6 +120,22 @@
     </div>
   </div>
 </section>
+
+<div class="post-dialog" id="postDialog" aria-hidden="true">
+  <div class="post-dialog-backdrop" data-post-dialog-close></div>
+  <section class="post-dialog-panel" role="dialog" aria-modal="true" aria-labelledby="postDialogTitle" tabindex="-1">
+    <button class="post-dialog-close" id="postDialogClose" type="button" aria-label="Close article">×</button>
+    <div class="post-dialog-image" id="postDialogImage"></div>
+    <div class="post-dialog-body">
+      <div class="post-meta">
+        <span class="post-label">PORTFOLIO JOURNAL</span>
+        <time id="postDialogDate"></time>
+      </div>
+      <h2 id="postDialogTitle"></h2>
+      <div class="post-dialog-content" id="postDialogContent"></div>
+    </div>
+  </section>
+</div>
 
 <!-- ===== ABOUT ===== -->
 <section class="section" id="about">
@@ -347,7 +363,7 @@
 <script src="js/nav-auth.js?v=20261107-4"></script>
 <script src="js/skills.js"></script>
 <script src="js/projects.js?v=20261002-1"></script>
-<script src="js/posts.js?v=20261107-6"></script>
+<script src="js/posts.js?v=20261107-7"></script>
 <script src="js/contact.js"></script>
 </body>
 </html>

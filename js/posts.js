@@ -1,8 +1,17 @@
 ﻿(function loadPosts() {
   const grid = document.getElementById('postsGrid');
   const loading = document.getElementById('postsLoading');
+  const dialog = document.getElementById('postDialog');
+  const dialogPanel = dialog?.querySelector('.post-dialog-panel');
+  const dialogClose = document.getElementById('postDialogClose');
+  const dialogImage = document.getElementById('postDialogImage');
+  const dialogTitle = document.getElementById('postDialogTitle');
+  const dialogDate = document.getElementById('postDialogDate');
+  const dialogContent = document.getElementById('postDialogContent');
   if (!grid || typeof db === 'undefined') return;
 
+  let lastTrigger = null;
+  let previousBodyOverflow = '';
   const timeout = window.setTimeout(() => {
     if (loading?.isConnected) loading.textContent = 'The newsroom is taking longer than expected to load.';
   }, 12000);
@@ -20,8 +29,7 @@
         .map(doc => ({ id: doc.id, ...doc.data() }))
         .sort((a, b) => createdAt(b) - createdAt(a));
 
-      const featured = renderPost(posts[0], true);
-      grid.appendChild(featured);
+      grid.appendChild(renderPost(posts[0], true));
       if (posts.length > 1) {
         const more = document.createElement('div');
         more.className = 'posts-more';
@@ -39,24 +47,19 @@
     });
 
   function renderPost(post, featured) {
-    const card = document.createElement('article');
+    const card = document.createElement('button');
+    card.type = 'button';
     card.className = `post-card ${featured ? 'post-featured' : 'post-compact'}`;
+    card.setAttribute('aria-haspopup', 'dialog');
+    card.setAttribute('aria-label', `Read update: ${post.title || 'Untitled update'}`);
+    card.addEventListener('click', () => openPost(post, card));
 
     const media = document.createElement('div');
     media.className = 'post-media';
     if (typeof post.imageUrl === 'string' && post.imageUrl.trim()) {
       const image = document.createElement('img');
-      const imageLink = document.createElement('a');
-      imageLink.className = 'post-image-link';
-      imageLink.href = post.imageUrl.trim();
-      imageLink.target = '_blank';
-      imageLink.rel = 'noopener noreferrer';
-      imageLink.setAttribute('aria-label', `Open the full image for ${post.title || 'this update'} in a new tab`);
       image.alt = post.title ? `${post.title} — news photo` : 'News update photo';
       image.loading = featured ? 'eager' : 'lazy';
-      const hint = document.createElement('span');
-      hint.className = 'post-image-hint';
-      hint.textContent = 'View full image ↗';
       image.onerror = () => {
         const fallbackUrl = image.dataset.fallback;
         if (fallbackUrl && image.src !== fallbackUrl) {
@@ -64,12 +67,11 @@
           image.src = fallbackUrl;
         } else {
           media.classList.add('post-media-unavailable');
-          imageLink.remove();
+          image.remove();
         }
       };
       setImageSource(image, post.imageUrl);
-      imageLink.append(image, hint);
-      media.appendChild(imageLink);
+      media.appendChild(image);
     } else {
       media.classList.add('post-media-placeholder');
     }
@@ -82,14 +84,11 @@
     label.className = 'post-label';
     label.textContent = featured ? 'LATEST UPDATE' : 'FIELD NOTE';
     meta.appendChild(label);
-
     const date = document.createElement('time');
     const timestamp = post.createdAt?.toDate?.();
     if (timestamp) {
       date.dateTime = timestamp.toISOString();
-      date.textContent = new Intl.DateTimeFormat(undefined, {
-        year: 'numeric', month: 'long', day: 'numeric'
-      }).format(timestamp);
+      date.textContent = formatDate(timestamp);
     }
     meta.appendChild(date);
 
@@ -98,25 +97,65 @@
     const content = document.createElement('p');
     content.className = 'post-card-content';
     content.textContent = post.content || '';
-    body.append(meta, title, content);
-
-    if ((post.content || '').length > (featured ? 300 : 180)) {
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'post-read-more';
-      toggle.textContent = 'Read full update';
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.addEventListener('click', () => {
-        const expanded = card.classList.toggle('is-expanded');
-        toggle.textContent = expanded ? 'Show less' : 'Read full update';
-        toggle.setAttribute('aria-expanded', String(expanded));
-      });
-      body.appendChild(toggle);
-    }
-
+    const cue = document.createElement('span');
+    cue.className = 'post-open-cue';
+    cue.textContent = 'READ STORY';
+    body.append(meta, title, content, cue);
     card.append(media, body);
     return card;
   }
+
+  function openPost(post, trigger) {
+    if (!dialog) return;
+    lastTrigger = trigger;
+    dialogImage.replaceChildren();
+    dialogImage.hidden = true;
+    if (typeof post.imageUrl === 'string' && post.imageUrl.trim()) {
+      const image = document.createElement('img');
+      image.alt = post.title ? `${post.title} — full image` : 'News update image';
+      image.onerror = () => {
+        const fallbackUrl = image.dataset.fallback;
+        if (fallbackUrl && image.src !== fallbackUrl) {
+          image.dataset.fallback = '';
+          image.src = fallbackUrl;
+        } else {
+          dialogImage.hidden = true;
+          image.remove();
+        }
+      };
+      setImageSource(image, post.imageUrl);
+      dialogImage.appendChild(image);
+      dialogImage.hidden = false;
+    }
+    dialogTitle.textContent = post.title || 'Untitled update';
+    dialogContent.textContent = post.content || '';
+    const timestamp = post.createdAt?.toDate?.();
+    dialogDate.textContent = timestamp ? formatDate(timestamp) : '';
+    dialogDate.dateTime = timestamp ? timestamp.toISOString() : '';
+    previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    dialog.classList.add('is-open');
+    dialog.setAttribute('aria-hidden', 'false');
+    dialogClose?.focus();
+  }
+
+  function closePost() {
+    if (!dialog?.classList.contains('is-open')) return;
+    dialog.classList.remove('is-open');
+    dialog.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = previousBodyOverflow;
+    lastTrigger?.focus();
+  }
+
+  dialogClose?.addEventListener('click', closePost);
+  dialog?.querySelector('[data-post-dialog-close]')?.addEventListener('click', closePost);
+  dialogPanel?.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closePost();
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      dialogClose?.focus();
+    }
+  });
 
   function renderEmptyState() {
     const empty = document.createElement('div');
@@ -137,6 +176,12 @@
     if (value && typeof value.toMillis === 'function') return value.toMillis();
     const parsed = value ? Date.parse(value) : 0;
     return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function formatDate(date) {
+    return new Intl.DateTimeFormat(undefined, {
+      year: 'numeric', month: 'long', day: 'numeric'
+    }).format(date);
   }
 
   function setImageSource(image, rawUrl) {
