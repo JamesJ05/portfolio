@@ -646,7 +646,7 @@ function resetPostForm() {
 }
 
 function loadAdminPosts() {
-  getDashboardSnapshot(db.collection('posts').get(), 'Updates')
+  getDashboardSnapshot(db.collection('posts'), 'Updates')
     .then(snapshot => {
       postList.replaceChildren();
       if (snapshot.empty) {
