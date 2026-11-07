@@ -33,6 +33,7 @@ auth.onAuthStateChanged(async user => {
   loadAdminProjects();
   loadSkillCategories();
   loadCertifications();
+  loadAdminPosts();
 });
 
 logoutBtn.addEventListener('click', () => auth.signOut());
@@ -587,6 +588,128 @@ function fillCertForm(id, c) {
 function deleteCert(id) {
   if (!confirm('Delete this certification?')) return;
   db.collection('certifications').doc(id).delete().then(() => loadCertifications());
+}
+
+/* =========================================================
+   POSTS / UPDATES
+========================================================= */
+const postForm = document.getElementById('postForm');
+const postEditId = document.getElementById('postEditId');
+const postTitle = document.getElementById('postTitle');
+const postContent = document.getElementById('postContent');
+const postImageUrl = document.getElementById('postImageUrl');
+const postFormTitle = document.getElementById('postFormTitle');
+const postStatus = document.getElementById('postStatus');
+const savePostBtn = document.getElementById('savePostBtn');
+const cancelPostEditBtn = document.getElementById('cancelPostEditBtn');
+const postList = document.getElementById('postList');
+
+postForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  savePostBtn.disabled = true;
+  setStatus(postStatus, '');
+  try {
+    const imageUrl = postImageUrl.value.trim();
+    if (imageUrl && !/^https:\/\//i.test(imageUrl)) throw new Error('Use a secure https image URL.');
+    const data = {
+      title: postTitle.value.trim(),
+      content: postContent.value.trim(),
+      imageUrl,
+      published: true,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (postEditId.value) {
+      await db.collection('posts').doc(postEditId.value).update(data);
+      setStatus(postStatus, 'Update saved.', false);
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('posts').add(data);
+      setStatus(postStatus, 'Update published.', false);
+    }
+    resetPostForm();
+    loadAdminPosts();
+  } catch (error) {
+    setStatus(postStatus, error.message || 'Could not save this update.', true);
+  } finally {
+    savePostBtn.disabled = false;
+  }
+});
+
+cancelPostEditBtn.addEventListener('click', resetPostForm);
+
+function resetPostForm() {
+  postForm.reset();
+  postEditId.value = '';
+  postFormTitle.textContent = 'Write an update';
+  savePostBtn.textContent = 'Publish update';
+  cancelPostEditBtn.hidden = true;
+}
+
+function loadAdminPosts() {
+  getDashboardSnapshot(db.collection('posts').get(), 'Updates')
+    .then(snapshot => {
+      postList.replaceChildren();
+      if (snapshot.empty) {
+        postList.innerHTML = '<p class="projects-empty">No updates yet. Publish your first post using the form.</p>';
+        return;
+      }
+      [...snapshot.docs].sort((a, b) => postCreatedAt(b.data()) - postCreatedAt(a.data())).forEach(doc => {
+        const post = doc.data();
+        const row = document.createElement('div');
+        row.className = 'admin-row';
+        if (post.imageUrl) {
+          const image = document.createElement('img');
+          image.className = 'post-admin-image';
+          image.src = post.imageUrl;
+          image.alt = '';
+          row.appendChild(image);
+        }
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const title = document.createElement('h3');
+        title.textContent = post.title || 'Untitled update';
+        const status = document.createElement('p');
+        status.textContent = 'Visible to everyone';
+        meta.append(title, status);
+        const actions = document.createElement('div');
+        actions.className = 'row-actions';
+        const edit = document.createElement('button');
+        edit.type = 'button';
+        edit.textContent = 'Edit';
+        edit.addEventListener('click', () => {
+          postEditId.value = doc.id;
+          postTitle.value = post.title || '';
+          postContent.value = post.content || '';
+          postImageUrl.value = post.imageUrl || '';
+          postFormTitle.textContent = 'Edit update';
+          savePostBtn.textContent = 'Save update';
+          cancelPostEditBtn.hidden = false;
+          document.querySelector('[data-panel="posts"]').click();
+        });
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'danger';
+        remove.textContent = 'Delete';
+        remove.addEventListener('click', async () => {
+          if (!confirm('Delete this update? This cannot be undone.')) return;
+          try { await db.collection('posts').doc(doc.id).delete(); loadAdminPosts(); }
+          catch (error) { setStatus(postStatus, error.message || 'Could not delete update.', true); }
+        });
+        actions.append(edit, remove);
+        row.append(meta, actions);
+        postList.appendChild(row);
+      });
+    })
+    .catch(error => {
+      postList.textContent = error.message || 'Could not load updates.';
+    });
+}
+
+function postCreatedAt(post) {
+  const value = post?.createdAt;
+  if (value && typeof value.toMillis === 'function') return value.toMillis();
+  const parsed = value ? Date.parse(value) : 0;
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 /* ---------- Helpers ---------- */

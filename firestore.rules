@@ -64,6 +64,36 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['title', 'content', 'imageUrl', 'published', 'createdAt', 'updatedAt'])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 1
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 1
+        && request.resource.data.content.size() <= 10000
+        && request.resource.data.imageUrl is string
+        && request.resource.data.imageUrl.size() <= 2000
+        && (request.resource.data.imageUrl == '' || request.resource.data.imageUrl.matches('^https://.*'))
+        && request.resource.data.published is bool;
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['title', 'content', 'imageUrl', 'published', 'updatedAt'])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 1
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 1
+        && request.resource.data.content.size() <= 10000
+        && request.resource.data.imageUrl is string
+        && request.resource.data.imageUrl.size() <= 2000
+        && (request.resource.data.imageUrl == '' || request.resource.data.imageUrl.matches('^https://.*'))
+        && request.resource.data.published is bool;
+      allow delete: if isAdmin();
+    }
+
     match /skillCategories/{categoryId} {
       allow read: if true;
       allow write: if isAdmin();

@@ -79,6 +79,7 @@
   }
   .seed-btn:hover{ border-color:var(--cyan); }
   .form-hint{ font-family:var(--font-mono); font-size:0.72rem; color:var(--text-faint); margin-top:-0.3rem; }
+  .post-admin-image{width:64px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;background:var(--surface-2)}
   @keyframes dashPanelIn{ from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
   @media (max-width:560px){ body{padding:1.25rem 1rem 3rem}.dash-header{padding:1.15rem}.dash-actions{width:100%}.dash-actions>*{flex:1;text-align:center}.dash-tabs{width:100%}.dash-tab{flex:1;padding:.55rem .5rem}.panel{padding:1.15rem}.admin-row{align-items:flex-start}.row-actions{flex-direction:column} }
 </style>
@@ -103,6 +104,7 @@
     <button class="dash-tab active" data-panel="projects">Projects</button>
     <button class="dash-tab" data-panel="skills">Skills</button>
     <button class="dash-tab" data-panel="certs">Certifications</button>
+    <button class="dash-tab" data-panel="posts">Updates</button>
   </div>
 
   <!-- PROJECTS -->
@@ -190,6 +192,29 @@
       </div>
     </div>
   </div>
+
+  <!-- UPDATES -->
+  <div class="dash-panel" id="panel-posts">
+    <div class="dash-grid">
+      <div class="panel">
+        <h2 id="postFormTitle">Write an update</h2>
+        <form id="postForm" class="dash-form">
+          <input type="hidden" id="postEditId" value="" />
+          <label>Title <input type="text" id="postTitle" maxlength="120" required placeholder="A new milestone" /></label>
+          <label>Post <textarea id="postContent" rows="7" maxlength="10000" required placeholder="Share what's new…"></textarea></label>
+          <label>Image URL <input type="url" id="postImageUrl" placeholder="https://… (optional)" /></label>
+          <p class="form-hint">Posts you save are visible to everyone in Latest Updates.</p>
+          <p class="form-status" id="postStatus" role="status" aria-live="polite"></p>
+          <button type="submit" class="btn btn-primary btn-block" id="savePostBtn">Publish update</button>
+          <button type="button" class="btn btn-ghost btn-block" id="cancelPostEditBtn" hidden>Cancel edit</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Your updates</h2>
+        <div class="admin-list" id="postList"><p class="projects-empty">Loading…</p></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -198,6 +223,6 @@
 <script src="../js/firebase-config.js"></script>
 <script src="../js/main.js"></script>
 <script src="../js/auth-utils.js"></script>
-<script src="../js/admin-dashboard.js?v=20261002-2"></script>
+<script src="../js/admin-dashboard.js?v=20261107-2"></script>
 </body>
 </html>

@@ -14,13 +14,19 @@ window.addEventListener('scroll', () => {
 
 const burger = document.getElementById('navBurger');
 const navLinks = document.querySelector('.nav-links');
+function closeMobileNav() {
+  navLinks?.classList.remove('is-open');
+  burger?.setAttribute('aria-expanded', 'false');
+  burger?.setAttribute('aria-label', 'Open navigation menu');
+}
 burger?.addEventListener('click', () => {
-  const open = navLinks.style.display === 'flex';
-  navLinks.style.display = open ? 'none' : 'flex';
-  navLinks.style.cssText += open ? '' : `
-    position:fixed; top:64px; left:0; right:0; flex-direction:column;
-    background:rgba(6,10,22,0.97); padding:1.5rem; gap:1.2rem; border-bottom:1px solid var(--border);
-  `;
+  const open = navLinks.classList.toggle('is-open');
+  burger.setAttribute('aria-expanded', String(open));
+  burger.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+});
+navLinks?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMobileNav));
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 860) closeMobileNav();
 });
 
 /* ---------- Scroll reveal ---------- */
