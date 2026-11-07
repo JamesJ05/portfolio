@@ -46,8 +46,17 @@
     media.className = 'post-media';
     if (typeof post.imageUrl === 'string' && post.imageUrl.trim()) {
       const image = document.createElement('img');
+      const imageLink = document.createElement('a');
+      imageLink.className = 'post-image-link';
+      imageLink.href = post.imageUrl.trim();
+      imageLink.target = '_blank';
+      imageLink.rel = 'noopener noreferrer';
+      imageLink.setAttribute('aria-label', `Open the full image for ${post.title || 'this update'} in a new tab`);
       image.alt = post.title ? `${post.title} — news photo` : 'News update photo';
       image.loading = featured ? 'eager' : 'lazy';
+      const hint = document.createElement('span');
+      hint.className = 'post-image-hint';
+      hint.textContent = 'View full image ↗';
       image.onerror = () => {
         const fallbackUrl = image.dataset.fallback;
         if (fallbackUrl && image.src !== fallbackUrl) {
@@ -55,11 +64,12 @@
           image.src = fallbackUrl;
         } else {
           media.classList.add('post-media-unavailable');
-          image.remove();
+          imageLink.remove();
         }
       };
       setImageSource(image, post.imageUrl);
-      media.appendChild(image);
+      imageLink.append(image, hint);
+      media.appendChild(imageLink);
     } else {
       media.classList.add('post-media-placeholder');
     }
